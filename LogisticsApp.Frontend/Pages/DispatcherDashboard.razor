@@ -1,0 +1,1014 @@
+﻿@* Pages/DispatcherDashboard.razor *@
+@page "/dispatcher"
+@attribute [Authorize(Roles = "Dispatcher,Manager")]
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@implements IDisposable
+
+<PageTitle>Dispatch Center - ABC Logistics</PageTitle>
+
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+<style>
+    .dsp-root {
+        font-family: 'Space Grotesk', sans-serif;
+        padding: 2rem 1.5rem 3rem;
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+
+    .dsp-header {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 1.75rem;
+    }
+
+    .dsp-eyebrow {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        color: #F4A100;
+        text-transform: uppercase;
+        margin-bottom: 0.3rem;
+    }
+
+    .dsp-h1 {
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: #0A1628;
+        margin: 0;
+    }
+
+    .dsp-refresh-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        background: #0A1628;
+        color: #fff;
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 0.8rem;
+        font-weight: 600;
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background 0.15s, transform 0.1s;
+        white-space: nowrap;
+    }
+
+        .dsp-refresh-btn:hover {
+            background: #1B3D6E;
+        }
+
+        .dsp-refresh-btn:active {
+            transform: scale(0.97);
+        }
+
+        .dsp-refresh-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+    .dsp-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.25rem;
+        align-items: start;
+    }
+
+    @@media (max-width: 820px) {
+        .dsp-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .dsp-panel {
+        border: 0.5px solid rgba(0,0,0,0.1);
+        border-radius: 12px;
+        overflow: hidden;
+        background: #fff;
+    }
+
+    .dsp-panel-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem 1.25rem;
+        border-bottom: 0.5px solid rgba(0,0,0,0.08);
+        background: linear-gradient(135deg, #0A1628 0%, #1B3D6E 100%);
+    }
+
+    .dsp-panel-title {
+        font-size: 0.875rem;
+        font-weight: 700;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .dsp-panel-count {
+        font-size: 11px;
+        font-weight: 700;
+        background: rgba(244,161,0,0.25);
+        color: #F4A100;
+        border: 1px solid rgba(244,161,0,0.4);
+        padding: 2px 8px;
+        border-radius: 20px;
+    }
+
+    .dsp-list {
+        display: flex;
+        flex-direction: column;
+        max-height: 580px;
+        overflow-y: auto;
+    }
+
+    .dsp-item {
+        padding: 1rem 1.25rem;
+        border-bottom: 0.5px solid rgba(0,0,0,0.06);
+        transition: background 0.15s;
+    }
+
+        .dsp-item:last-child {
+            border-bottom: none;
+        }
+
+        .dsp-item:hover {
+            background: #fafafa;
+        }
+
+    .dsp-item-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 0.3rem;
+    }
+
+    .dsp-tracking-id {
+        font-size: 0.875rem;
+        font-weight: 700;
+        color: #0A1628;
+        letter-spacing: 0.04em;
+    }
+
+    .dsp-status-badge {
+        font-size: 10px;
+        font-weight: 700;
+        padding: 3px 9px;
+        border-radius: 20px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        white-space: nowrap;
+    }
+
+    .badge-in-transit {
+        background: rgba(244,161,0,0.15);
+        color: #BA7517;
+        border: 1px solid rgba(244,161,0,0.35);
+    }
+
+    .badge-pending {
+        background: rgba(133,183,235,0.15);
+        color: #185FA5;
+        border: 1px solid rgba(133,183,235,0.4);
+    }
+
+    .badge-delivered {
+        background: rgba(29,158,117,0.15);
+        color: #0F6E56;
+        border: 1px solid rgba(29,158,117,0.35);
+    }
+
+    .badge-delayed {
+        background: rgba(226,75,74,0.15);
+        color: #A32D2D;
+        border: 1px solid rgba(226,75,74,0.35);
+    }
+
+    .badge-default {
+        background: rgba(180,178,169,0.2);
+        color: #5F5E5A;
+        border: 1px solid rgba(180,178,169,0.4);
+    }
+
+    .dsp-address {
+        font-size: 0.78rem;
+        color: #888;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .dsp-control-row {
+        display: flex;
+        gap: 0.4rem;
+        margin-bottom: 0.5rem;
+        align-items: stretch;
+    }
+
+    .dsp-control-label {
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #aaa;
+        background: #f5f5f5;
+        border: 0.5px solid rgba(0,0,0,0.1);
+        border-right: none;
+        border-radius: 6px 0 0 6px;
+        padding: 0 0.6rem;
+        display: flex;
+        align-items: center;
+        white-space: nowrap;
+        width: 80px;
+    }
+
+    .dsp-select-input {
+        flex: 1;
+        border: 0.5px solid rgba(0,0,0,0.1);
+        border-left: none;
+        border-right: none;
+        padding: 0.45rem 0.5rem;
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 0.8rem;
+        font-weight: 500;
+        color: #0A1628;
+        outline: none;
+        background: #fff;
+        min-width: 0;
+    }
+
+        .dsp-select-input:focus {
+            background: #fafcff;
+        }
+
+    .dsp-action-btn {
+        background: #0A1628;
+        color: #fff;
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 0 0.75rem;
+        border: none;
+        border-radius: 0 6px 6px 0;
+        cursor: pointer;
+        transition: background 0.15s;
+        white-space: nowrap;
+        width: 85px;
+    }
+
+        .dsp-action-btn:hover {
+            background: #1B3D6E;
+        }
+
+    .dsp-dispatch-btn {
+        background: #F4A100;
+        color: #0A1628;
+    }
+
+        .dsp-dispatch-btn:hover {
+            background: #e09500;
+        }
+
+    .dsp-map-body {
+        min-height: 460px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f0f4f8;
+        padding: 2rem;
+    }
+
+    .dsp-map-placeholder {
+        text-align: center;
+    }
+
+    .dsp-map-icon {
+        font-size: 2.5rem;
+        margin-bottom: 0.75rem;
+        display: block;
+    }
+
+    .dsp-map-title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #0A1628;
+        margin-bottom: 0.35rem;
+    }
+
+    .dsp-map-sub {
+        font-size: 0.78rem;
+        color: #999;
+        line-height: 1.55;
+    }
+
+    .dsp-map-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        margin-top: 0.85rem;
+        font-size: 11px;
+        font-weight: 600;
+        background: rgba(244,161,0,0.12);
+        color: #BA7517;
+        border: 1px solid rgba(244,161,0,0.3);
+        padding: 4px 10px;
+        border-radius: 20px;
+    }
+
+    .dsp-live-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #F4A100;
+        animation: dspPulse 1.8s ease-in-out infinite;
+    }
+
+    @@keyframes dspPulse {
+        0%, 100% {
+            box-shadow: 0 0 0 0 rgba(244,161,0,0.5);
+        }
+
+        50% {
+            box-shadow: 0 0 0 4px rgba(244,161,0,0);
+        }
+    }
+
+    .dsp-empty {
+        padding: 2.5rem 1rem;
+        text-align: center;
+        color: #aaa;
+        font-size: 0.85rem;
+    }
+
+    .dsp-loading {
+        padding: 2rem;
+        text-align: center;
+        font-size: 0.85rem;
+        color: #999;
+    }
+
+    .dsp-spin {
+        display: inline-block;
+        animation: dspSpin 1s linear infinite;
+        margin-right: 0.4rem;
+    }
+
+    @@keyframes dspSpin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .dsp-toast {
+        position: fixed;
+        bottom: 1.5rem;
+        left: 50%;
+        transform: translateX(-50%) translateY(60px);
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 13px;
+        font-weight: 500;
+        padding: 0.55rem 1.25rem;
+        border-radius: 20px;
+        z-index: 999;
+        pointer-events: none;
+        transition: transform 0.3s, opacity 0.3s;
+        opacity: 0;
+    }
+
+        .dsp-toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .dsp-toast.success {
+            background: #0A1628;
+            color: #5DCAA5;
+            border: 1px solid rgba(29,158,117,0.3);
+        }
+
+        .dsp-toast.error {
+            background: #0A1628;
+            color: #f09595;
+            border: 1px solid rgba(226,75,74,0.3);
+        }
+
+    .timeline-modal-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(10,22,40,0.6);
+        backdrop-filter: blur(4px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+
+    .timeline-modal {
+        background: #fff;
+        width: 100%;
+        max-width: 500px;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        max-height: 80vh;
+        overflow-y: auto;
+        position: relative;
+    }
+
+    .timeline-close {
+        position: absolute;
+        top: 1.5rem;
+        right: 1.5rem;
+        background: transparent;
+        border: none;
+        font-size: 1.5rem;
+        color: #888;
+        cursor: pointer;
+    }
+
+    .timeline-container {
+        position: relative;
+        padding-left: 1.5rem;
+        margin-top: 1.5rem;
+    }
+
+        .timeline-container::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: rgba(0,0,0,0.08);
+        }
+
+    .timeline-item {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+
+    .timeline-dot {
+        position: absolute;
+        left: -1.5rem;
+        top: 0.2rem;
+        transform: translateX(-50%);
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #F4A100;
+        border: 2px solid #fff;
+        box-shadow: 0 0 0 2px rgba(244,161,0,0.2);
+    }
+
+    .timeline-date {
+        font-size: 0.75rem;
+        color: #888;
+        font-weight: 600;
+        margin-bottom: 0.2rem;
+    }
+
+    .timeline-action {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: #0A1628;
+    }
+
+    .timeline-details {
+        font-size: 0.8rem;
+        color: #555;
+    }
+
+    .timeline-user {
+        font-size: 0.7rem;
+        color: #aaa;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-top: 0.2rem;
+    }
+
+    /* ── Session Expired Overlay ── */
+    .session-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(10,22,40,0.78);
+        backdrop-filter: blur(6px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+        animation: fadeIn 0.3s ease;
+    }
+
+    .session-card {
+        background: #fff;
+        border-radius: 16px;
+        padding: 2.5rem 2rem;
+        max-width: 340px;
+        width: 90%;
+        text-align: center;
+        box-shadow: 0 24px 48px rgba(0,0,0,0.25);
+        animation: slideUp 0.35s ease;
+    }
+
+    .session-icon {
+        font-size: 2.8rem;
+        margin-bottom: 1rem;
+    }
+
+    .session-title {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: #0A1628;
+        margin-bottom: 0.5rem;
+    }
+
+    .session-sub {
+        font-size: 0.82rem;
+        color: #888;
+        line-height: 1.65;
+        margin-bottom: 1.5rem;
+    }
+
+    .session-bar-track {
+        background: rgba(0,0,0,0.08);
+        border-radius: 99px;
+        height: 5px;
+        overflow: hidden;
+    }
+
+    .session-bar-fill {
+        height: 100%;
+        width: 100%;
+        background: linear-gradient(90deg, #F4A100, #e09500);
+        border-radius: 99px;
+        animation: drainBar 3s linear forwards;
+    }
+
+    @@keyframes drainBar {
+        from {
+            width: 100%;
+        }
+
+        to {
+            width: 0%;
+        }
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    @@keyframes slideUp {
+        from {
+            transform: translateY(20px);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+</style>
+
+<div class="dsp-root">
+
+    <div class="dsp-header">
+        <div>
+            <div class="dsp-eyebrow">Dispatcher</div>
+            <h1 class="dsp-h1">Command Center</h1>
+        </div>
+        <button class="dsp-refresh-btn" @onclick="LoadDashboard" disabled="@isLoading">
+            <span class="@(isLoading ? "dsp-spin" : "")">↻</span>
+            @(isLoading ? "Refreshing…" : "Refresh")
+        </button>
+    </div>
+
+    <div class="dsp-grid">
+
+        <div class="dsp-panel">
+            <div class="dsp-panel-header">
+                <span class="dsp-panel-title">📦 Active Deliveries</span>
+                <span class="dsp-panel-count">@activeShipments.Count</span>
+            </div>
+
+            <div class="dsp-list">
+                @if (isLoading)
+                {
+                    <div class="dsp-loading">
+                        <span class="dsp-spin">↻</span> Loading shipments…
+                    </div>
+                }
+                else if (!activeShipments.Any())
+                {
+                    <div class="dsp-empty">No active shipments right now.</div>
+                }
+                else
+                {
+                    @foreach (var pkg in activeShipments)
+                    {
+                        <div class="dsp-item">
+
+                            <div class="dsp-item-top">
+                                <div>
+                                    <span class="dsp-tracking-id">@pkg.TrackingId</span>
+                                    <span class="dsp-status-badge @GetBadgeClass(pkg.CurrentStatus)">@pkg.CurrentStatus</span>
+                                </div>
+                                <button class="btn btn-sm btn-light border shadow-sm"
+                                        style="font-size:0.75rem;font-weight:600;font-family:'Space Grotesk',sans-serif;"
+                                        @onclick="@(() => OpenTimeline(pkg.TrackingId))">
+                                    📜 History
+                                </button>
+                            </div>
+
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.2rem;">
+                                <div style="font-size:0.85rem;font-weight:600;color:#0A1628;">
+                                    👤 @(string.IsNullOrEmpty(pkg.CustomerName) ? "Unknown Customer" : pkg.CustomerName)
+                                </div>
+                                <div style="font-size:0.75rem;font-weight:600;color:#555;">
+                                    📞 @(string.IsNullOrEmpty(pkg.CustomerPhone) ? "No Phone" : pkg.CustomerPhone)
+                                </div>
+                            </div>
+                            <div class="dsp-address">📍 @pkg.DeliveryAddress</div>
+
+                            <div class="dsp-control-row">
+                                <span class="dsp-control-label">Status</span>
+                                <select class="dsp-select-input"
+                                        @onchange="@(e => UpdateTempStatus(pkg.TrackingId, e.Value?.ToString() ?? ""))">
+                                    <option value="Processing" selected="@(pkg.CurrentStatus == "Processing")">Processing</option>
+                                    <option value="Assigned to Driver" selected="@(pkg.CurrentStatus == "Assigned to Driver")">Assigned</option>
+                                    <option value="Out for delivery" selected="@(pkg.CurrentStatus == "Out for delivery")">Out for delivery</option>
+                                    <option value="In Transit" selected="@(pkg.CurrentStatus == "In Transit")">In Transit</option>
+                                    <option value="Delayed" selected="@(pkg.CurrentStatus == "Delayed")">Delayed</option>
+                                    <option value="Delivered" selected="@(pkg.CurrentStatus == "Delivered")">Delivered</option>
+                                </select>
+                                <button class="dsp-action-btn" @onclick="@(() => SaveStatus(pkg.TrackingId))">Save</button>
+                            </div>
+
+                            <div class="dsp-control-row">
+                                <span class="dsp-control-label">Driver</span>
+                                <select class="dsp-select-input"
+                                        @onchange="@(e => SelectDriver(pkg.TrackingId, e.Value?.ToString() ?? ""))">
+                                    <option value="">— Unassigned —</option>
+                                    <option value="Kamal Perera" selected="@(pkg.AssignedDriverName == "Kamal Perera")">Kamal Perera</option>
+                                    <option value="Nimal Rathnayaka" selected="@(pkg.AssignedDriverName == "Nimal Rathnayaka")">Nimal Rathnayaka</option>
+                                    <option value="Rathnasekara" selected="@(pkg.AssignedDriverName == "Rathnasekara")">Rathnasekara</option>
+                                </select>
+                                <button class="dsp-action-btn dsp-dispatch-btn" @onclick="@(() => DispatchPackage(pkg.TrackingId))">
+                                    @(string.IsNullOrEmpty(pkg.AssignedDriverName) ? "Dispatch ↗" : "Reassign ↻")
+                                </button>
+                            </div>
+
+                            <div class="dsp-control-row">
+                                <span class="dsp-control-label">Est. Time</span>
+                                <input type="datetime-local" class="dsp-select-input"
+                                       value="@GetDateTimeValue(pkg)"
+                                       @onchange="@(e => UpdateTempDate(pkg.TrackingId, e.Value?.ToString() ?? ""))" />
+                                <button class="dsp-action-btn" @onclick="@(() => ReschedulePackage(pkg.TrackingId))">Update</button>
+                            </div>
+
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+
+        <div class="dsp-panel">
+            <div class="dsp-panel-header">
+                <span class="dsp-panel-title">🗺️ Live Fleet Map</span>
+                <div class="dsp-map-badge">
+                    <span class="dsp-live-dot"></span> GPS streaming
+                </div>
+            </div>
+            <div class="dsp-map-body">
+                <div class="dsp-map-placeholder">
+                    <span class="dsp-map-icon">🗺️</span>
+                    <div class="dsp-map-title">Map integration ready</div>
+                    <div class="dsp-map-sub">
+                        Drop in a Google Maps or Leaflet component here.<br />
+                        GPS lat/lng coordinates stream live from the backend.
+                    </div>
+                    <div class="dsp-map-badge" style="margin-top:1rem">
+                        <span class="dsp-live-dot"></span>
+                        @activeShipments.Count active vehicle@(activeShipments.Count == 1 ? "" : "s") broadcasting
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="dsp-toast @toastCss">@toastMessage</div>
+
+@if (showTimelineModal)
+{
+    <div class="timeline-modal-backdrop" @onclick="CloseTimeline">
+        <div class="timeline-modal" @onclick:stopPropagation>
+            <button class="timeline-close" @onclick="CloseTimeline">×</button>
+            <h4 class="fw-bold mb-1" style="font-family:'Space Grotesk',sans-serif;">Audit Trail</h4>
+            <p class="text-muted small">Tracking ID: @selectedHistoryId</p>
+
+            @if (activeLogs == null)
+            {
+                <div class="text-center py-4"><span class="dsp-spin">↻</span> Loading history...</div>
+            }
+            else if (!activeLogs.Any())
+            {
+                <div class="text-center py-4 text-muted">No logs recorded yet.</div>
+            }
+            else
+            {
+                <div class="timeline-container">
+                    @foreach (var log in activeLogs)
+                    {
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-date">@log.Timestamp.ToString("MMM dd, yyyy - hh:mm tt")</div>
+                            <div class="timeline-action">@log.Action</div>
+                            <div class="timeline-details">@log.Details</div>
+                            <div class="timeline-user">👤 @log.PerformedBy</div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@* Session Expired Overlay *@
+@if (showSessionExpired)
+{
+    <div class="session-backdrop">
+        <div class="session-card">
+            <div class="session-icon">🔒</div>
+            <div class="session-title">Session Expired</div>
+            <div class="session-sub">
+                Your session has timed out.<br />
+                Redirecting to login…
+            </div>
+            <div class="session-bar-track">
+                <div class="session-bar-fill"></div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<Shipment> activeShipments = new();
+    private Dictionary<string, string> selectedStatuses = new();
+    private Dictionary<string, string> selectedDrivers = new();
+    private Dictionary<string, DateTime> rescheduleDates = new();
+
+    private bool isLoading = false;
+    private bool showSessionExpired = false;
+    private string toastMessage = "";
+    private string toastCss = "";
+    private CancellationTokenSource? _toastCts;
+    private CancellationTokenSource _cts = new();
+
+    private bool showTimelineModal = false;
+    private string selectedHistoryId = "";
+    private List<ShipmentLogDto>? activeLogs;
+
+    // ✅ Subscribe to location changes so navigating back reloads data
+    protected override async Task OnInitializedAsync()
+    {
+        NavigationManager.LocationChanged += OnLocationChanged;
+        await LoadDashboard();
+    }
+
+    // ✅ Fires every time the URL changes to /dispatcher (back button, nav link)
+    private async void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        if (e.Location.Contains("/dispatcher", StringComparison.OrdinalIgnoreCase))
+        {
+            await LoadDashboard();
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async Task LoadDashboard()
+    {
+        _cts.Cancel();
+        _cts.Dispose();
+        _cts = new CancellationTokenSource();
+
+        isLoading = true;
+        StateHasChanged();
+
+        try
+        {
+            var response = await Http.GetAsync("api/dispatcher/active-shipments", _cts.Token);
+
+            // ✅ 401 → show session expired overlay then redirect
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                showSessionExpired = true;
+                isLoading = false;
+                StateHasChanged();
+                await Task.Delay(3000, _cts.Token);
+                NavigationManager.NavigateTo("/login", forceLoad: true);
+                return;
+            }
+
+            if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+            {
+                ShowToast("You don't have permission to view this page", false);
+                isLoading = false;
+                StateHasChanged();
+                return;
+            }
+
+            response.EnsureSuccessStatusCode();
+
+            activeShipments = await response.Content
+                .ReadFromJsonAsync<List<Shipment>>(_cts.Token) ?? new();
+
+            selectedStatuses.Clear();
+            selectedDrivers.Clear();
+            rescheduleDates.Clear();
+        }
+        catch (OperationCanceledException)
+        {
+            // navigated away or disposed — safe to ignore
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Dashboard load failed: {ex.Message}");
+            ShowToast("Failed to load shipments", false);
+        }
+        finally
+        {
+            // ✅ always reset loading state unless we returned early above
+            if (!_cts.IsCancellationRequested && !showSessionExpired)
+            {
+                isLoading = false;
+                StateHasChanged();
+            }
+        }
+    }
+
+    // --- TIMELINE ---
+    private async Task OpenTimeline(string trackingId)
+    {
+        selectedHistoryId = trackingId;
+        showTimelineModal = true;
+        activeLogs = null;
+        StateHasChanged();
+
+        try
+        {
+            activeLogs = await Http.GetFromJsonAsync<List<ShipmentLogDto>>(
+                $"api/dispatcher/shipment-logs/{trackingId}") ?? new();
+        }
+        catch
+        {
+            activeLogs = new();
+        }
+    }
+
+    private void CloseTimeline()
+    {
+        showTimelineModal = false;
+        selectedHistoryId = "";
+        activeLogs = null;
+    }
+
+    // --- STATUS ---
+    private void UpdateTempStatus(string trackingId, string status)
+        => selectedStatuses[trackingId] = status;
+
+    private async Task SaveStatus(string trackingId)
+    {
+        if (!selectedStatuses.TryGetValue(trackingId, out var status)) return;
+
+        var response = await Http.PutAsJsonAsync("api/driver/update-status",
+            new { TrackingId = trackingId, NewStatus = status });
+
+        if (response.IsSuccessStatusCode) { await LoadDashboard(); ShowToast("Status updated", true); }
+        else { ShowToast("Update failed — try again", false); }
+    }
+
+    // --- DRIVER ---
+    private void SelectDriver(string trackingId, string driverName)
+        => selectedDrivers[trackingId] = driverName;
+
+    private async Task DispatchPackage(string trackingId)
+    {
+        if (!selectedDrivers.TryGetValue(trackingId, out var driver)
+            || string.IsNullOrEmpty(driver)) return;
+
+        var response = await Http.PutAsJsonAsync("api/dispatcher/assign-driver",
+            new { TrackingId = trackingId, DriverName = driver });
+
+        if (response.IsSuccessStatusCode) { await LoadDashboard(); ShowToast($"Assigned to {driver}", true); }
+        else { ShowToast("Dispatch failed — try again", false); }
+    }
+
+    // --- DATETIME ---
+    private void UpdateTempDate(string trackingId, string dateString)
+    {
+        if (DateTime.TryParse(dateString, out var parsed))
+            rescheduleDates[trackingId] = parsed;
+    }
+
+    private string GetDateTimeValue(Shipment pkg)
+        => rescheduleDates.TryGetValue(pkg.TrackingId, out var d)
+            ? d.ToString("yyyy-MM-ddTHH:mm")
+            : pkg.EstimatedDelivery?.ToString("yyyy-MM-ddTHH:mm") ?? "";
+
+    private async Task ReschedulePackage(string trackingId)
+    {
+        if (!rescheduleDates.TryGetValue(trackingId, out var date)) return;
+
+        var response = await Http.PutAsJsonAsync("api/dispatcher/reschedule",
+            new { TrackingId = trackingId, NewDate = date });
+
+        if (response.IsSuccessStatusCode) { await LoadDashboard(); ShowToast("Delivery time updated", true); }
+        else { ShowToast("Reschedule failed — try again", false); }
+    }
+
+    // --- UTILITIES ---
+    private static string GetBadgeClass(string? status) => status?.ToLower() switch
+    {
+        "in transit" or "in-transit" => "badge-in-transit",
+        "delivered" => "badge-delivered",
+        "pending" => "badge-pending",
+        "delayed" => "badge-delayed",
+        "processing" => "badge-pending",
+        "out for delivery" => "badge-in-transit",
+        "assigned to driver" => "badge-pending",
+        _ => "badge-default"
+    };
+
+    private void ShowToast(string message, bool success)
+    {
+        _toastCts?.Cancel();
+        _toastCts = new CancellationTokenSource();
+        _ = RunToastAsync(message, success, _toastCts.Token);
+    }
+
+    private async Task RunToastAsync(string message, bool success, CancellationToken token)
+    {
+        toastMessage = message;
+        toastCss = $"show {(success ? "success" : "error")}";
+        StateHasChanged();
+
+        try
+        {
+            await Task.Delay(2800, token);
+            toastCss = success ? "success" : "error";
+            StateHasChanged();
+        }
+        catch (TaskCanceledException) { }
+    }
+
+    // ✅ Unsubscribe from LocationChanged to prevent memory leak
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
+        _cts.Cancel();
+        _cts.Dispose();
+        _toastCts?.Cancel();
+        _toastCts?.Dispose();
+    }
+
+    // --- MODELS ---
+    public class Shipment
+    {
+        public string TrackingId { get; set; } = "";
+        public string CustomerName { get; set; } = "";
+        public string CustomerPhone { get; set; } = "";
+        public string DeliveryAddress { get; set; } = "";
+        public string CurrentStatus { get; set; } = "";
+        public string? AssignedDriverName { get; set; }
+        public DateTime? EstimatedDelivery { get; set; }
+    }
+
+    public class ShipmentLogDto
+    {
+        public string Action { get; set; } = "";
+        public string Details { get; set; } = "";
+        public string PerformedBy { get; set; } = "";
+        public DateTime Timestamp { get; set; }
+    }
+}

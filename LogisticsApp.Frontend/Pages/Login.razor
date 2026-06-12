@@ -1,0 +1,419 @@
+﻿@* Pages/Login.razor *@
+@page "/login"
+@using LogisticsApp.Frontend.Auth
+@inject HttpClient Http
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager NavigationManager
+
+<PageTitle>Staff Login - ABC Logistics</PageTitle>
+
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+<style>
+    .lgn-page {
+        font-family: 'Space Grotesk', sans-serif;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f0f2f5;
+        padding: 2rem 1rem;
+    }
+
+    /* ── Card ── */
+    .lgn-card {
+        width: 100%;
+        max-width: 420px;
+        background: #fff;
+        border-radius: 16px;
+        border: 0.5px solid rgba(0,0,0,0.08);
+        overflow: hidden;
+    }
+
+    /* ── Card header ── */
+    .lgn-card-header {
+        background: linear-gradient(135deg, #0A1628 0%, #1B3D6E 100%);
+        padding: 2rem 2rem 1.75rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .lgn-header-route {
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        pointer-events: none;
+        opacity: 0.1;
+    }
+
+    .lgn-brand-row {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .lgn-brand-icon {
+        width: 34px;
+        height: 34px;
+        background: #F4A100;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 17px;
+        flex-shrink: 0;
+    }
+
+    .lgn-brand-name {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: #fff;
+    }
+
+    .lgn-brand-sub {
+        font-size: 10px;
+        color: rgba(255,255,255,0.45);
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+    }
+
+    .lgn-header-title {
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: #fff;
+        margin: 0 0 0.25rem;
+        line-height: 1.2;
+    }
+
+    .lgn-header-sub {
+        font-size: 0.8rem;
+        color: rgba(255,255,255,0.5);
+        margin: 0;
+    }
+
+    /* ── Card body ── */
+    .lgn-card-body {
+        padding: 1.75rem 2rem 2rem;
+    }
+
+    /* ── Field ── */
+    .lgn-field {
+        margin-bottom: 1rem;
+    }
+
+    .lgn-label {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.09em;
+        color: #999;
+        margin-bottom: 0.4rem;
+        display: block;
+    }
+
+    .lgn-input-wrap {
+        display: flex;
+        align-items: stretch;
+        border: 1px solid rgba(0,0,0,0.12);
+        border-radius: 8px;
+        overflow: hidden;
+        transition: border-color 0.15s;
+    }
+
+        .lgn-input-wrap:focus-within {
+            border-color: #1B3D6E;
+            box-shadow: 0 0 0 3px rgba(27,61,110,0.08);
+        }
+
+    .lgn-input-icon {
+        background: #f8f8f8;
+        border-right: 1px solid rgba(0,0,0,0.08);
+        padding: 0 0.7rem;
+        display: flex;
+        align-items: center;
+        font-size: 14px;
+        color: #aaa;
+        flex-shrink: 0;
+    }
+
+    .lgn-input {
+        flex: 1;
+        border: none;
+        outline: none;
+        padding: 0.65rem 0.75rem;
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 0.9rem;
+        color: #0A1628;
+        background: #fff;
+        min-width: 0;
+    }
+
+        .lgn-input::placeholder { color: #ccc; }
+
+    .lgn-pw-toggle {
+        background: transparent;
+        border: none;
+        border-left: 1px solid rgba(0,0,0,0.08);
+        padding: 0 0.75rem;
+        cursor: pointer;
+        color: #bbb;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        transition: color 0.15s;
+    }
+
+        .lgn-pw-toggle:hover { color: #555; }
+
+    /* ── Submit button ── */
+    .lgn-submit {
+        width: 100%;
+        background: #0A1628;
+        color: #fff;
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 0.9rem;
+        font-weight: 700;
+        padding: 0.75rem;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background 0.15s, transform 0.1s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 1.5rem;
+    }
+
+        .lgn-submit:hover:not(:disabled) { background: #1B3D6E; }
+        .lgn-submit:active:not(:disabled) { transform: scale(0.98); }
+        .lgn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .lgn-spin {
+        display: inline-block;
+        animation: lgnSpin 0.8s linear infinite;
+    }
+
+    @@keyframes lgnSpin { to { transform: rotate(360deg); } }
+
+    /* ── Error ── */
+    .lgn-error {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(226,75,74,0.08);
+        border: 1px solid rgba(226,75,74,0.25);
+        border-radius: 8px;
+        padding: 0.65rem 0.85rem;
+        font-size: 0.825rem;
+        color: #A32D2D;
+        margin-top: 1rem;
+    }
+
+    /* ── Footer ── */
+    .lgn-footer {
+        padding: 0.85rem 2rem 1.25rem;
+        border-top: 0.5px solid rgba(0,0,0,0.06);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .lgn-footer-text {
+        font-size: 11px;
+        color: #ccc;
+    }
+
+    .lgn-hotline {
+        font-size: 11px;
+        font-weight: 600;
+        color: #aaa;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        text-decoration: none;
+    }
+
+    .lgn-hotline-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #1D9E75;
+        animation: lgnPulse 1.8s ease-in-out infinite;
+    }
+
+    @@keyframes lgnPulse {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(29,158,117,0.5); }
+        50%       { box-shadow: 0 0 0 4px rgba(29,158,117,0); }
+    }
+</style>
+
+<div class="lgn-page">
+    <div class="lgn-card">
+
+        <!-- Header -->
+        <div class="lgn-card-header">
+            <svg class="lgn-header-route" viewBox="0 0 420 160" preserveAspectRatio="none">
+                <path d="M-10,50 Q80,20 160,70 T340,40 T440,80" stroke="#F4A100" stroke-width="2" fill="none" stroke-dasharray="8 5"/>
+                <path d="M-10,120 Q100,90 200,130 T440,110" stroke="#378ADD" stroke-width="1.5" fill="none" stroke-dasharray="6 6" opacity="0.6"/>
+            </svg>
+
+            <div class="lgn-brand-row">
+                <div class="lgn-brand-icon">🚚</div>
+                <div>
+                    <div class="lgn-brand-name">ABC Logistics</div>
+                    <div class="lgn-brand-sub">Fleet Management</div>
+                </div>
+            </div>
+
+            <div class="lgn-header-title">Staff portal access</div>
+            <p class="lgn-header-sub">Sign in with your assigned credentials</p>
+        </div>
+
+        <!-- Body -->
+        <div class="lgn-card-body">
+
+            <!-- Email -->
+            <div class="lgn-field">
+                <label class="lgn-label">Email address</label>
+                <div class="lgn-input-wrap">
+                    <span class="lgn-input-icon">✉</span>
+                    <input class="lgn-input"
+                           type="email"
+                           placeholder="name@abclogistics.com"
+                           @bind="loginRequest.Email"
+                           @onkeydown="OnKeyDown"
+                           autocomplete="username" />
+                </div>
+            </div>
+
+            <!-- Password -->
+            <div class="lgn-field">
+                <label class="lgn-label">Password</label>
+                <div class="lgn-input-wrap">
+                    <span class="lgn-input-icon">🔒</span>
+                    <input class="lgn-input"
+                           type="@(showPassword ? "text" : "password")"
+                           placeholder="••••••••"
+                           @bind="loginRequest.Password"
+                           @onkeydown="OnKeyDown"
+                           autocomplete="current-password" />
+                    <button class="lgn-pw-toggle" type="button" @onclick="TogglePassword"
+                            title="@(showPassword ? "Hide password" : "Show password")">
+                        @(showPassword ? "🙈" : "👁")
+                    </button>
+                </div>
+            </div>
+
+            <!-- Submit -->
+            <button class="lgn-submit" @onclick="HandleLogin" disabled="@isLoading">
+                @if (isLoading)
+                {
+                    <span class="lgn-spin">↻</span>
+                    <span>Authenticating…</span>
+                }
+                else
+                {
+                    <span>Sign in →</span>
+                }
+            </button>
+
+            <!-- Error -->
+            @if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <div class="lgn-error">
+                    ⚠ @errorMessage
+                </div>
+            }
+
+        </div>
+
+        <!-- Footer -->
+        <div class="lgn-footer">
+            <span class="lgn-footer-text">© ABC Logistics</span>
+            <span class="lgn-hotline">
+                <span class="lgn-hotline-dot"></span>
+                Support: 011 123 4567
+            </span>
+        </div>
+
+    </div>
+</div>
+
+@code {
+    private LoginRequest loginRequest = new();
+    private bool isLoading    = false;
+    private bool showPassword = false;
+    private string? errorMessage;
+
+    private void TogglePassword() => showPassword = !showPassword;
+
+    private async Task OnKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") await HandleLogin();
+    }
+
+    private async Task HandleLogin()
+    {
+        errorMessage = null;
+
+        if (string.IsNullOrWhiteSpace(loginRequest.Email) || string.IsNullOrWhiteSpace(loginRequest.Password))
+        {
+            errorMessage = "Please enter your email and password.";
+            return;
+        }
+
+        isLoading = true;
+
+        try
+        {
+            var response = await Http.PostAsJsonAsync("api/auth/login", loginRequest);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<AuthResponse>();
+
+                await LocalStorage.SetItemAsStringAsync("authToken", result!.Token);
+                ((CustomAuthStateProvider)AuthStateProvider).NotifyUserLoggedIn(result.Token);
+
+                NavigationManager.NavigateTo(result.Role switch
+                {
+                    "Manager"    => "/manager",
+                    "Dispatcher" => "/dispatcher",
+                    "Driver"     => "/driver",
+                    _            => "/"
+                });
+            }
+            else
+            {
+                errorMessage = "Incorrect email or password — please try again.";
+            }
+        }
+        catch
+        {
+            errorMessage = "Could not reach the server. Check your connection and retry.";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    public class LoginRequest
+    {
+        public string Email    { get; set; } = "";
+        public string Password { get; set; } = "";
+        public string Role     { get; set; } = "";
+    }
+
+    public class AuthResponse
+    {
+        public string Token    { get; set; } = "";
+        public string FullName { get; set; } = "";
+        public string Role     { get; set; } = "";
+    }
+}

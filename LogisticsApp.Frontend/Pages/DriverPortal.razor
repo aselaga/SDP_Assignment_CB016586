@@ -1,0 +1,384 @@
+﻿@page "/driver"
+@attribute [Authorize(Roles = "Driver")]
+@inject HttpClient Http
+
+<PageTitle>My Route - ABC Logistics</PageTitle>
+
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+<style>
+    body { background-color: #f4f7f9; }
+    
+    .drv-root {
+        font-family: 'Space Grotesk', sans-serif;
+        padding: 1.5rem 1rem 5rem;
+        max-width: 600px; /* Mobile focused width */
+        margin: 0 auto;
+    }
+
+    /* ── Header ── */
+    .drv-header {
+        margin-bottom: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .drv-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #0A1628;
+        margin: 0;
+    }
+
+    .drv-subtitle {
+        font-size: 0.85rem;
+        color: #888;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .drv-refresh {
+        background: #fff;
+        border: 1px solid rgba(0,0,0,0.1);
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        color: #0A1628;
+        cursor: pointer;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    /* ── Delivery Card ── */
+    .drv-card {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+        margin-bottom: 1.25rem;
+        overflow: hidden;
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .drv-card-header {
+        background: #0A1628;
+        color: #fff;
+        padding: 0.85rem 1.25rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .drv-tracking { font-weight: 700; font-size: 1rem; letter-spacing: 0.05em; }
+    
+    .drv-badge {
+        font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 20px;
+        text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .badge-transit { background: #BA7517; color: #fff; }
+    .badge-delivered { background: #1D9E75; color: #fff; }
+    .badge-pending { background: #185FA5; color: #fff; }
+
+    .drv-card-body { padding: 1.25rem; }
+
+    .drv-customer-name { font-size: 1.1rem; font-weight: 700; color: #0A1628; margin-bottom: 0.25rem; }
+    
+    .drv-contact-row {
+        display: flex; gap: 0.75rem; margin-bottom: 1rem;
+    }
+    
+    .drv-action-link {
+        display: inline-flex; align-items: center; gap: 0.4rem;
+        font-size: 0.8rem; font-weight: 600; color: #1B3D6E;
+        text-decoration: none; background: rgba(27,61,110,0.08);
+        padding: 0.4rem 0.75rem; border-radius: 6px;
+    }
+
+    .drv-address {
+        font-size: 0.95rem; color: #444; line-height: 1.4;
+        margin-bottom: 1.25rem; padding-left: 1.5rem;
+        position: relative;
+    }
+    .drv-address::before { content: '📍'; position: absolute; left: 0; top: 0; }
+
+    /* ── Action Buttons ── */
+    .drv-actions {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;
+        border-top: 1px solid rgba(0,0,0,0.06); padding: 1.25rem; background: #fafafa;
+    }
+
+    .drv-btn {
+        padding: 0.85rem; border: none; border-radius: 8px; font-family: 'Space Grotesk', sans-serif;
+        font-size: 0.85rem; font-weight: 700; cursor: pointer; text-align: center;
+        transition: transform 0.1s;
+    }
+    .drv-btn:active { transform: scale(0.96); }
+
+    .btn-transit { background: #F4A100; color: #0A1628; grid-column: span 2; }
+    .btn-deliver { background: #1D9E75; color: #fff; grid-column: span 2; }
+    .btn-delay { background: transparent; color: #A32D2D; border: 1px solid #A32D2D; }
+    .btn-history { background: #e9ecef; color: #555; }
+
+    /* ── Toast & Timeline (Reused from Dispatcher) ── */
+    .drv-toast {
+        position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(80px);
+        font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 600;
+        padding: 0.75rem 1.5rem; border-radius: 30px; z-index: 999;
+        transition: transform 0.3s, opacity 0.3s; opacity: 0; box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    }
+    .drv-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    .drv-toast.success { background: #0A1628; color: #5DCAA5; }
+    .drv-toast.error { background: #A32D2D; color: #fff; }
+
+    .timeline-modal-backdrop {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(10, 22, 40, 0.7); backdrop-filter: blur(4px);
+        display: flex; align-items: flex-end; justify-content: center; z-index: 1000;
+    }
+    .timeline-modal {
+        background: #fff; width: 100%; border-radius: 20px 20px 0 0;
+        padding: 2rem 1.5rem; max-height: 85vh; overflow-y: auto; position: relative;
+    }
+    .timeline-close {
+        position: absolute; top: 1.5rem; right: 1.5rem; background: #f0f0f0;
+        border: none; width: 32px; height: 32px; border-radius: 50%;
+        font-size: 1.2rem; color: #555; cursor: pointer;
+    }
+    .timeline-container { position: relative; padding-left: 1.5rem; margin-top: 1.5rem; }
+    .timeline-container::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: rgba(0,0,0,0.1); }
+    .timeline-item { position: relative; margin-bottom: 1.5rem; }
+    .timeline-dot {
+        position: absolute; left: -1.5rem; top: 0.2rem; transform: translateX(-50%);
+        width: 14px; height: 14px; border-radius: 50%; background: #F4A100;
+        border: 3px solid #fff; box-shadow: 0 0 0 2px rgba(244,161,0,0.3);
+    }
+    .timeline-date { font-size: 0.8rem; color: #888; font-weight: 600; }
+    .timeline-action { font-size: 1rem; font-weight: 700; color: #0A1628; }
+    .timeline-details { font-size: 0.85rem; color: #555; margin-top: 0.2rem; }
+    .timeline-user { font-size: 0.75rem; color: #aaa; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.4rem; }
+</style>
+
+<div class="drv-root">
+
+    <div class="drv-header">
+        <div>
+            <div class="drv-subtitle">Today's Route</div>
+            <h1 class="drv-title">My Manifest</h1>
+        </div>
+        <button class="drv-refresh" @onclick="LoadMyRoute">↻</button>
+    </div>
+
+    @if (myShipments == null)
+    {
+        <div style="text-align: center; padding: 3rem; color: #888;">Loading route...</div>
+    }
+    else if (!myShipments.Any())
+    {
+        <div style="text-align: center; padding: 3rem; color: #888; background: #fff; border-radius: 12px;">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">☕</div>
+            <h3 class="fw-bold text-dark">All Caught Up!</h3>
+            <p>You have no assigned packages right now.</p>
+        </div>
+    }
+    else
+    {
+        @foreach (var pkg in myShipments)
+        {
+            <div class="drv-card">
+                <div class="drv-card-header">
+                    <span class="drv-tracking">TRK-@pkg.TrackingId</span>
+                    <span class="drv-badge @GetBadgeClass(pkg.CurrentStatus)">@pkg.CurrentStatus</span>
+                </div>
+                
+                <div class="drv-card-body">
+                    <div class="drv-customer-name">@(string.IsNullOrEmpty(pkg.CustomerName) ? "Unknown Customer" : pkg.CustomerName)</div>
+                    
+                    <div class="drv-contact-row">
+                        @if (!string.IsNullOrEmpty(pkg.CustomerPhone))
+                        {
+                            <a href="tel:@pkg.CustomerPhone" class="drv-action-link">📞 Call</a>
+                        }
+                        <a href="https://maps.google.com/?q=@Uri.EscapeDataString(pkg.DeliveryAddress)" target="_blank" class="drv-action-link">🗺️ Navigate</a>
+                    </div>
+
+                    <div class="drv-address">@pkg.DeliveryAddress</div>
+                </div>
+
+                <div class="drv-actions">
+                    @if (pkg.CurrentStatus == "Out for delivery" || pkg.CurrentStatus == "Processing")
+                    {
+                        <button class="drv-btn btn-transit" @onclick="@(() => UpdateStatus(pkg.TrackingId, "In Transit"))">
+                            🚚 Start Route (In Transit)
+                        </button>
+                    }
+                    else if (pkg.CurrentStatus == "In Transit" || pkg.CurrentStatus == "Delayed")
+                    {
+                        <button class="drv-btn btn-deliver" @onclick="@(() => UpdateStatus(pkg.TrackingId, "Delivered"))">
+                            ✅ Mark as Delivered
+                        </button>
+                        <button class="drv-btn btn-delay" @onclick="@(() => UpdateStatus(pkg.TrackingId, "Delayed"))">
+                            ⚠ Report Delay
+                        </button>
+                    }
+                    
+                    <button class="drv-btn btn-history" @onclick="@(() => OpenTimeline(pkg.TrackingId))" style="@(pkg.CurrentStatus == "Delivered" ? "grid-column: span 2;" : "")">
+                        📜 View Log
+                    </button>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+<div class="drv-toast @toastCss">@toastMessage</div>
+
+@if (showTimelineModal)
+{
+    <div class="timeline-modal-backdrop" @onclick="CloseTimeline">
+        <div class="timeline-modal" @onclick:stopPropagation>
+            <button class="timeline-close" @onclick="CloseTimeline">×</button>
+            <h4 class="fw-bold mb-1">Audit Trail</h4>
+            <p class="text-muted small mb-4">@selectedHistoryId</p>
+
+            @if (activeLogs == null)
+            {
+                <div class="text-center py-4 text-muted">Loading history...</div>
+            }
+            else if (!activeLogs.Any())
+            {
+                <div class="text-center py-4 text-muted">No logs recorded yet.</div>
+            }
+            else
+            {
+                <div class="timeline-container">
+                    @foreach (var log in activeLogs)
+                    {
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-date">@log.Timestamp.ToString("MMM dd - hh:mm tt")</div>
+                            <div class="timeline-action">@log.Action</div>
+                            <div class="timeline-details">@log.Details</div>
+                            <div class="timeline-user">👤 @log.PerformedBy</div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    private List<Shipment> myShipments;
+
+    // Toast
+    private string toastMessage = "";
+    private string toastCss = "";
+    private System.Threading.CancellationTokenSource? _toastCts;
+
+    // Timeline Modal
+    private bool showTimelineModal = false;
+    private string selectedHistoryId = "";
+    private List<ShipmentLogDto> activeLogs;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadMyRoute();
+    }
+
+    private async Task LoadMyRoute()
+    {
+        // For a true production app, you would create an endpoint like "api/driver/my-shipments"
+        // that filters based on the JWT token. Here we fetch active and filter client side 
+        // or just show all for demo purposes if auth isn't fully linked.
+        var allActive = await Http.GetFromJsonAsync<List<Shipment>>("api/dispatcher/active-shipments");
+        
+        // Example filter: Only show packages not yet delivered
+        if (allActive != null)
+        {
+            myShipments = allActive.Where(s => s.CurrentStatus != "Delivered").ToList();
+        }
+    }
+
+    private async Task UpdateStatus(string trackingId, string newStatus)
+    {
+        var response = await Http.PutAsJsonAsync("api/driver/update-status",
+            new { TrackingId = trackingId, NewStatus = newStatus });
+            
+        if (response.IsSuccessStatusCode) 
+        { 
+            await LoadMyRoute(); 
+            ShowToast($"Marked as {newStatus}", true); 
+        }
+        else                              
+        { 
+            ShowToast("Update failed. Check connection.", false); 
+        }
+    }
+
+    private async Task OpenTimeline(string trackingId)
+    {
+        selectedHistoryId = trackingId;
+        showTimelineModal = true;
+        activeLogs = null; 
+        
+        try
+        {
+            activeLogs = await Http.GetFromJsonAsync<List<ShipmentLogDto>>($"api/dispatcher/shipment-logs/{trackingId}");
+        }
+        catch
+        {
+            activeLogs = new List<ShipmentLogDto>();
+        }
+    }
+
+    private void CloseTimeline()
+    {
+        showTimelineModal = false;
+        selectedHistoryId = "";
+        activeLogs = null;
+    }
+
+    private static string GetBadgeClass(string? status) => status?.ToLower() switch
+    {
+        "in transit" or "in-transit" => "badge-transit",
+        "delivered"                  => "badge-delivered",
+        _                            => "badge-pending"
+    };
+
+    private async void ShowToast(string message, bool success)
+    {
+        _toastCts?.Cancel();
+        _toastCts = new System.Threading.CancellationTokenSource();
+        var token = _toastCts.Token;
+        toastMessage = message;
+        toastCss = $"show {(success ? "success" : "error")}";
+        StateHasChanged();
+        try
+        {
+            await Task.Delay(3000, token);
+            if (!token.IsCancellationRequested) { toastCss = success ? "success" : "error"; StateHasChanged(); }
+        }
+        catch (TaskCanceledException) { }
+    }
+
+    public class Shipment
+    {
+        public string TrackingId { get; set; } = "";
+        public string CustomerName { get; set; } = "";
+        public string CustomerPhone { get; set; } = "";
+        public string DeliveryAddress { get; set; } = "";
+        public string CurrentStatus { get; set; } = "";
+    }
+
+    public class ShipmentLogDto
+    {
+        public string Action { get; set; } = "";
+        public string Details { get; set; } = "";
+        public string PerformedBy { get; set; } = "";
+        public DateTime Timestamp { get; set; }
+    }
+}

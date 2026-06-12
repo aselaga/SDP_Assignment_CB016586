@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "New Profile",
+    "Projects": [
+      {
+        "Path": "LogisticsApp.Api\\LogisticsApp.Api.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "LogisticsApp.Frontend\\LogisticsApp.Frontend.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

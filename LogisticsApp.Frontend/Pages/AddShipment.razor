@@ -1,0 +1,487 @@
+﻿@* Pages/AddShipment.razor *@
+@page "/add-shipment"
+@attribute [Authorize(Roles = "Dispatcher")]
+@inject HttpClient Http
+
+<PageTitle>Add Shipment - ABC Logistics</PageTitle>
+
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+<style>
+    .add-root {
+        font-family: 'Space Grotesk', sans-serif;
+        max-width: 520px;
+        margin: 2rem auto;
+        padding: 0 1rem 3rem;
+    }
+
+    /* ── Header ── */
+    .add-eyebrow {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        color: #F4A100;
+        text-transform: uppercase;
+        margin-bottom: 0.3rem;
+    }
+
+    .add-h1 {
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: #0A1628;
+        margin: 0 0 0.4rem;
+    }
+
+    .add-sub {
+        font-size: 0.825rem;
+        color: #999;
+        margin: 0 0 1.75rem;
+        line-height: 1.55;
+    }
+
+    /* ── Card ── */
+    .add-card {
+        background: #fff;
+        border: 0.5px solid rgba(0,0,0,0.1);
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .add-card-header {
+        background: linear-gradient(135deg, #0A1628 0%, #1B3D6E 100%);
+        padding: 1.1rem 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .add-card-header svg {
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        pointer-events: none;
+        opacity: 0.1;
+    }
+
+    .add-card-title {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: #fff;
+        position: relative;
+    }
+
+    .add-card-body {
+        padding: 1.5rem;
+    }
+
+    /* ── Field ── */
+    .add-field {
+        margin-bottom: 1.1rem;
+    }
+
+    .add-label {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.09em;
+        color: #999;
+        margin-bottom: 0.4rem;
+        display: block;
+    }
+
+    .add-input-wrap {
+        display: flex;
+        align-items: stretch;
+        border: 1px solid rgba(0,0,0,0.12);
+        border-radius: 8px;
+        overflow: hidden;
+        transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+        .add-input-wrap:focus-within {
+            border-color: #1B3D6E;
+            box-shadow: 0 0 0 3px rgba(27,61,110,0.08);
+        }
+
+    .add-input-icon {
+        background: #f8f8f8;
+        border-right: 1px solid rgba(0,0,0,0.08);
+        padding: 0 0.7rem;
+        display: flex;
+        align-items: center;
+        font-size: 14px;
+        color: #bbb;
+        flex-shrink: 0;
+        align-self: stretch;
+    }
+
+    .add-input {
+        flex: 1;
+        border: none;
+        outline: none;
+        padding: 0.65rem 0.75rem;
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 0.9rem;
+        color: #0A1628;
+        background: #fff;
+        min-width: 0;
+        resize: none;
+    }
+
+        .add-input::placeholder { color: #ccc; }
+
+    /* ── Divider ── */
+    .add-divider {
+        height: 0.5px;
+        background: rgba(0,0,0,0.07);
+        margin: 1.25rem 0;
+    }
+
+    /* ── Submit ── */
+    .add-submit {
+        width: 100%;
+        background: #0A1628;
+        color: #fff;
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 0.9rem;
+        font-weight: 700;
+        padding: 0.75rem;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background 0.15s, transform 0.1s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+        .add-submit:hover:not(:disabled)  { background: #1B3D6E; }
+        .add-submit:active:not(:disabled) { transform: scale(0.98); }
+        .add-submit:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    .add-spin {
+        display: inline-block;
+        animation: addSpin 0.8s linear infinite;
+    }
+
+    @@keyframes addSpin { to { transform: rotate(360deg); } }
+
+    /* ── Error ── */
+    .add-error {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(226,75,74,0.08);
+        border: 1px solid rgba(226,75,74,0.25);
+        border-radius: 8px;
+        padding: 0.65rem 0.85rem;
+        font-size: 0.825rem;
+        color: #A32D2D;
+        margin-top: 0.85rem;
+    }
+
+    /* ── Success card ── */
+    .add-success {
+        margin-top: 1.25rem;
+        background: #fff;
+        border: 1px solid rgba(29,158,117,0.3);
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .add-success-header {
+        background: rgba(29,158,117,0.08);
+        border-bottom: 1px solid rgba(29,158,117,0.15);
+        padding: 0.75rem 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.825rem;
+        font-weight: 700;
+        color: #0F6E56;
+    }
+
+    .add-success-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #1D9E75;
+        animation: addPulse 1.8s ease-in-out infinite;
+        flex-shrink: 0;
+    }
+
+    @@keyframes addPulse {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(29,158,117,0.5); }
+        50%       { box-shadow: 0 0 0 5px rgba(29,158,117,0); }
+    }
+
+    .add-success-body {
+        padding: 1.25rem;
+        text-align: center;
+    }
+
+    .add-success-label {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: #aaa;
+        margin-bottom: 0.5rem;
+    }
+
+    .add-tracking-id {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #0A1628;
+        letter-spacing: 0.1em;
+        margin-bottom: 0.75rem;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .add-tracking-id span {
+        color: #F4A100;
+    }
+
+    .add-copy-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        background: transparent;
+        border: 1px solid rgba(0,0,0,0.12);
+        border-radius: 20px;
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 11px;
+        font-weight: 600;
+        color: #555;
+        padding: 4px 12px;
+        cursor: pointer;
+        transition: background 0.15s, border-color 0.15s;
+    }
+
+        .add-copy-btn:hover { background: #f5f5f5; border-color: rgba(0,0,0,0.2); }
+        .add-copy-btn.copied { color: #0F6E56; border-color: rgba(29,158,117,0.4); }
+
+    .add-success-note {
+        font-size: 0.75rem;
+        color: #bbb;
+        margin-top: 0.75rem;
+        line-height: 1.5;
+    }
+
+    /* ── Another btn ── */
+    .add-another-btn {
+        width: 100%;
+        background: transparent;
+        border: 1px solid rgba(0,0,0,0.1);
+        border-radius: 8px;
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 0.825rem;
+        font-weight: 600;
+        color: #555;
+        padding: 0.6rem;
+        cursor: pointer;
+        margin-top: 0.75rem;
+        transition: background 0.15s;
+    }
+
+        .add-another-btn:hover { background: #f8f8f8; }
+</style>
+
+<div class="add-root">
+
+    <div class="add-eyebrow">Dispatcher</div>
+    <h1 class="add-h1">Create shipment</h1>
+    <p class="add-sub">
+        Fill in the delivery details. A tracking ID is generated automatically
+        and the package is pushed to the dispatch queue.
+    </p>
+
+    <div class="add-card">
+
+        <div class="add-card-header">
+            <svg viewBox="0 0 520 80" preserveAspectRatio="none">
+                <path d="M-10,30 Q80,10 180,45 T380,25 T540,50" stroke="#F4A100" stroke-width="2" fill="none" stroke-dasharray="8 5"/>
+            </svg>
+            <span style="font-size:16px; position:relative;">📦</span>
+            <span class="add-card-title">New shipment details</span>
+        </div>
+
+        <div class="add-card-body">
+
+            <!-- Customer name -->
+            <div class="add-field">
+                <label class="add-label">Customer name</label>
+                <div class="add-input-wrap">
+                    <span class="add-input-icon">👤</span>
+                    <input class="add-input"
+                           type="text"
+                           placeholder="First Name and Last Name"
+                           @bind="newRequest.CustomerName"
+                           @onkeydown="OnKeyDown" />
+                </div>
+            </div>
+
+            <!-- Customer phone -->
+           <div class="add-field">
+                <label class="add-label">Customer phone</label>
+                <div class="add-input-wrap">
+                    <span class="add-input-icon">📞</span>
+                    <input class="add-input"
+                           type="tel"
+                           placeholder="eg: 077 123 4567"
+                           @bind="newRequest.CustomerPhone"
+                           @onkeydown="OnKeyDown" />
+                </div>
+            </div>
+
+            <!-- Delivery address -->
+            <div class="add-field">
+                <label class="add-label">Delivery address</label>
+                <div class="add-input-wrap" style="align-items:flex-start">
+                    <span class="add-input-icon" style="padding-top:0.65rem">📍</span>
+                    <textarea class="add-input"
+                              rows="3"
+                              placeholder="e.g. 123 Main St, Colombo 03"
+                              @bind="newRequest.DeliveryAddress"></textarea>
+                </div>
+            </div>
+
+            <div class="add-divider"></div>
+
+            <!-- Submit -->
+            <button class="add-submit" @onclick="SubmitShipment" disabled="@isSubmitting">
+                @if (isSubmitting)
+                {
+                    <span class="add-spin">↻</span>
+                    <span>Generating tracking ID…</span>
+                }
+                else
+                {
+                    <span>Create shipment →</span>
+                }
+            </button>
+
+            <!-- Error -->
+            @if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <div class="add-error">⚠ @errorMessage</div>
+            }
+
+            <!-- Success -->
+            @if (!string.IsNullOrEmpty(generatedTrackingId))
+            {
+                <div class="add-success">
+                    <div class="add-success-header">
+                        <span class="add-success-dot"></span>
+                        Shipment created — added to dispatcher queue
+                    </div>
+                    <div class="add-success-body">
+                        <div class="add-success-label">Tracking ID — share with customer</div>
+                        <div class="add-tracking-id">TRK–<span>@generatedTrackingId</span></div>
+                        <button class="add-copy-btn @(copied ? "copied" : "")" @onclick="CopyTrackingId">
+                            @(copied ? "✓ Copied" : "⎘ Copy ID")
+                        </button>
+                        <div class="add-success-note">
+                            Customer can track at abclogistics.com/track
+                        </div>
+                    </div>
+                </div>
+
+                <button class="add-another-btn" @onclick="ResetForm">
+                    + Create another shipment
+                </button>
+            }
+
+        </div>
+    </div>
+</div>
+
+@code {
+    private CreateShipmentRequest newRequest = new();
+    private bool   isSubmitting       = false;
+    private bool   copied             = false;
+    private string? generatedTrackingId;
+    private string? errorMessage;
+
+    private async Task OnKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") await SubmitShipment();
+    }
+
+    private async Task SubmitShipment()
+    {
+        errorMessage        = null;
+        generatedTrackingId = null;
+
+        if (string.IsNullOrWhiteSpace(newRequest.CustomerName))
+        {
+            errorMessage = "Please enter the customer name.";
+            return;
+        }
+        if (string.IsNullOrWhiteSpace(newRequest.DeliveryAddress))
+        {
+            errorMessage = "Please enter a delivery address.";
+            return;
+        }
+
+        isSubmitting = true;
+
+        try
+        {
+            var response = await Http.PostAsJsonAsync("api/dispatcher/add-shipment", newRequest);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<ShipmentResponse>();
+                generatedTrackingId      = result!.TrackingId;
+                newRequest.DeliveryAddress = "";
+                newRequest.CustomerName    = "";
+                copied = false;
+            }
+            else
+            {
+                errorMessage = "Failed to create shipment. Please try again.";
+            }
+        }
+        catch
+        {
+            errorMessage = "Could not reach the server. Check your connection and retry.";
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+
+    private async Task CopyTrackingId()
+    {
+        if (string.IsNullOrEmpty(generatedTrackingId)) return;
+        
+        copied = true;
+        StateHasChanged();
+        await Task.Delay(2000);
+        copied = false;
+    }
+
+    private void ResetForm()
+    {
+        generatedTrackingId = null;
+        errorMessage        = null;
+        newRequest          = new();
+    }
+
+    public class CreateShipmentRequest
+    {
+        public string CustomerName    { get; set; } = "";
+        public string DeliveryAddress { get; set; } = "";
+        public string CustomerPhone { get; set; } = "";
+    }
+
+    public class ShipmentResponse
+    {
+        public string TrackingId { get; set; } = "";
+    }
+}

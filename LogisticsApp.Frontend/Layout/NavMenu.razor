@@ -1,0 +1,381 @@
+﻿@* Shared/NavMenu.razor *@
+@using Microsoft.AspNetCore.Components.Authorization
+@* @inject AuthenticationStateProvider AuthStateProvider *@
+
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+<style>
+    .nav-root {
+        font-family: 'Space Grotesk', sans-serif;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        background: #0A1628;
+        width: 240px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        z-index: 100;
+        overflow-y: auto;
+        transition: transform 0.25s ease;
+    }
+
+    /* ── Brand ── */
+    .nav-brand {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 1.4rem 1.25rem 1rem;
+        border-bottom: 0.5px solid rgba(255,255,255,0.08);
+        text-decoration: none;
+        margin-bottom: 0.5rem;
+    }
+
+    .nav-brand-icon {
+        width: 32px;
+        height: 32px;
+        background: #F4A100;
+        border-radius: 7px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        flex-shrink: 0;
+    }
+
+    .nav-brand-text {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.1;
+    }
+
+    .nav-brand-name {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: #fff;
+    }
+
+    .nav-brand-sub {
+        font-size: 10px;
+        color: rgba(255,255,255,0.4);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+    }
+
+    /* ── Section label ── */
+    .nav-section-label {
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: rgba(255,255,255,0.28);
+        padding: 0.85rem 1.25rem 0.35rem;
+    }
+
+    /* ── Nav links ── */
+    .nav-item-wrap {
+        padding: 0 0.75rem;
+        margin-bottom: 2px;
+    }
+
+    .nav-link-item {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        padding: 0.55rem 0.75rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: rgba(255,255,255,0.6);
+        transition: background 0.15s, color 0.15s;
+        width: 100%;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        font-family: 'Space Grotesk', sans-serif;
+        text-align: left;
+    }
+
+        .nav-link-item:hover {
+            background: rgba(255,255,255,0.07);
+            color: rgba(255,255,255,0.9);
+        }
+
+        .nav-link-item.active {
+            background: rgba(244,161,0,0.15);
+            color: #F4A100;
+        }
+
+        .nav-link-item.active .nav-link-icon {
+            color: #F4A100;
+        }
+
+    .nav-link-icon {
+        font-size: 15px;
+        width: 18px;
+        text-align: center;
+        flex-shrink: 0;
+        color: rgba(255,255,255,0.35);
+        transition: color 0.15s;
+    }
+
+    /* ── Role badge ── */
+    .nav-role-badge {
+        margin-left: auto;
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        padding: 2px 6px;
+        border-radius: 4px;
+    }
+
+    .badge-dispatcher { background: rgba(55,138,221,0.2);  color: #85B7EB; }
+    .badge-manager    { background: rgba(99,153,34,0.2);   color: #97C459; }
+    .badge-driver     { background: rgba(244,161,0,0.2);   color: #F4A100; }
+
+    /* ── Divider ── */
+    .nav-divider {
+        height: 0.5px;
+        background: rgba(255,255,255,0.07);
+        margin: 0.75rem 1.25rem;
+    }
+
+    /* ── Bottom auth area ── */
+    .nav-bottom {
+        margin-top: auto;
+        padding: 0 0.75rem 1.25rem;
+        border-top: 0.5px solid rgba(255,255,255,0.07);
+        padding-top: 0.75rem;
+    }
+
+    .nav-logout {
+        color: #f09595;
+    }
+
+        .nav-logout:hover {
+            background: rgba(226,75,74,0.12);
+            color: #F09595;
+        }
+
+    .nav-login {
+        color: #5DCAA5;
+    }
+
+        .nav-login:hover {
+            background: rgba(29,158,117,0.1);
+            color: #5DCAA5;
+        }
+
+    /* ── Mobile toggle ── */
+    .nav-toggle {
+        display: none;
+        position: fixed;
+        top: 0.85rem;
+        left: 0.85rem;
+        z-index: 200;
+        width: 38px;
+        height: 38px;
+        background: #0A1628;
+        border: 1px solid rgba(255,255,255,0.15);
+        border-radius: 8px;
+        cursor: pointer;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .hamburger-line {
+        width: 16px;
+        height: 2px;
+        background: #fff;
+        border-radius: 2px;
+        transition: opacity 0.2s;
+    }
+
+    .nav-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 99;
+    }
+
+    @@media (max-width: 768px) {
+        .nav-root {
+            transform: translateX(-100%);
+        }
+
+            .nav-root.open {
+                transform: translateX(0);
+            }
+
+        .nav-toggle {
+            display: flex;
+        }
+
+        .nav-overlay.open {
+            display: block;
+        }
+    }
+</style>
+
+<!-- Mobile toggle button -->
+<button class="nav-toggle" @onclick="ToggleNavMenu" title="Toggle navigation" aria-label="Toggle navigation">
+    <div class="hamburger-line"></div>
+    <div class="hamburger-line"></div>
+    <div class="hamburger-line"></div>
+</button>
+
+<!-- Mobile overlay -->
+<div class="nav-overlay @(menuOpen ? "open" : "")" @onclick="ToggleNavMenu"></div>
+
+<!-- Sidebar -->
+<div class="nav-root @(menuOpen ? "open" : "")">
+
+    <!-- Brand -->
+    <a class="nav-brand" href="/">
+        <div class="nav-brand-icon">🚚</div>
+        <div class="nav-brand-text">
+            <span class="nav-brand-name">ABC Logistics</span>
+            <span class="nav-brand-sub">Fleet Management</span>
+        </div>
+    </a>
+
+    <!-- Public links -->
+    <div class="nav-section-label">Navigation</div>
+
+    <div class="nav-item-wrap">
+        <NavLink class="nav-link-item" href="/" Match="NavLinkMatch.All" ActiveClass="active" @onclick="CloseMenu">
+            <span class="nav-link-icon">🏠</span> Home
+        </NavLink>
+    </div>
+    <div class="nav-item-wrap">
+        <NavLink class="nav-link-item" href="/track" ActiveClass="active" @onclick="CloseMenu">
+            <span class="nav-link-icon">📦</span> Track Package
+        </NavLink>
+    </div>
+
+   <nav class="flex-column">
+        <AuthorizeView>
+            <Authorized>
+                <div class="nav-item px-3 py-3 text-white">
+                    <div style="font-size: 0.8rem; opacity: 0.7;">Welcome back,</div>
+                    <div style="font-weight: 700; font-size: 1rem;">@context.User.Identity?.Name</div>
+                </div>
+                <hr style="border-color: rgba(255,255,255,0.1); margin: 0 1rem;" />
+            </Authorized>
+        </AuthorizeView>
+        </nav>
+    
+
+    <!-- Dispatcher -->
+    <AuthorizeView Roles="Dispatcher">
+        <Authorized>
+            <div class="nav-divider"></div>
+            <div class="nav-section-label">Dispatcher</div>
+            <div class="nav-item-wrap">
+                <NavLink class="nav-link-item" href="/add-shipment" ActiveClass="active" @onclick="CloseMenu">
+                    <span class="nav-link-icon">➕</span>
+                    Add Shipment
+                    <span class="nav-role-badge badge-dispatcher">D</span>
+                </NavLink>
+            </div>
+            <div class="nav-item-wrap">
+                <NavLink class="nav-link-item" href="/dispatcher" ActiveClass="active" @onclick="CloseMenu">
+                    <span class="nav-link-icon">🖥️</span>
+                    Dispatch Center
+                    <span class="nav-role-badge badge-dispatcher">D</span>
+                </NavLink>
+            </div>
+            
+        </Authorized>
+    </AuthorizeView>
+
+    <!-- Manager -->
+    <AuthorizeView Roles="Manager,Dispatcher">
+        <Authorized>
+            <div class="nav-divider"></div>
+            <div class="nav-section-label">Report</div>
+            <div class="nav-item-wrap">
+                <NavLink class="nav-link-item" href="/manager" ActiveClass="active" @onclick="CloseMenu">
+                    <span class="nav-link-icon">📊</span>
+                    Analytics
+                    <span class="nav-role-badge">M,D</span>
+                </NavLink>
+            </div> </Authorized>
+    </AuthorizeView>
+
+        <AuthorizeView Roles="Manager">
+        <Authorized>
+            <div class="nav-item-wrap">
+                    <NavLink class="nav-link-item" href="user-management" ActiveClass="active" @onclick="CloseMenu">
+                        <span class="nav-link-icon">⚙️</span>
+                        Staff Management
+                        @* <span class="oi oi-people" aria-hidden="true"></span> Staff Management *@
+                         <span class="nav-role-badge badge-manager">M</span>
+                    </NavLink>
+                </div>
+        </Authorized>
+    </AuthorizeView>
+
+
+    <!-- Driver -->
+    <AuthorizeView Roles="Driver">
+        <Authorized>
+            <div class="nav-divider"></div>
+            <div class="nav-section-label">Driver</div>
+            <div class="nav-item-wrap">
+                <NavLink class="nav-link-item" href="/driver" ActiveClass="active" @onclick="CloseMenu">
+                    <span class="nav-link-icon">📱</span>
+                    Driver Portal
+                    <span class="nav-role-badge badge-driver">DR</span>
+                </NavLink>
+            </div>
+        </Authorized>
+    </AuthorizeView>
+
+
+
+    <!-- Auth footer -->
+    <div class="nav-bottom">
+        
+        <AuthorizeView>
+            <Authorized>
+                <button class="nav-link-item nav-logout" @onclick="Logout">
+                    <span class="nav-link-icon">🚪</span> Logout
+                </button>
+            </Authorized>
+            <NotAuthorized>
+                <NavLink class="nav-link-item nav-login" href="/login" ActiveClass="active" @onclick="CloseMenu">
+                    <span class="nav-link-icon">🔑</span> Staff Login
+                </NavLink>
+            </NotAuthorized>
+        </AuthorizeView>
+    </div>
+
+    
+
+</div>
+
+@code {
+    private bool menuOpen = false;
+
+    [Inject] private Blazored.LocalStorage.ILocalStorageService LocalStorage { get; set; } = default!;
+    [Inject] private AuthenticationStateProvider AuthStateProvider { get; set; } = default!;
+    [Inject] private NavigationManager NavigationManager { get; set; } = default!;
+
+    private void ToggleNavMenu() => menuOpen = !menuOpen;
+    private void CloseMenu()    => menuOpen = false;
+
+    private async Task Logout()
+    {
+        menuOpen = false;
+        await LocalStorage.RemoveItemAsync("authToken");
+        ((LogisticsApp.Frontend.Auth.CustomAuthStateProvider)AuthStateProvider).NotifyUserLoggedOut();
+        NavigationManager.NavigateTo("/");
+    }
+}

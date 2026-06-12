@@ -1,0 +1,577 @@
+﻿@* Pages/CustomerTracking.razor *@
+@page "/track"
+@page "/track/{Id}"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+<PageTitle>Track Shipment - ABC Logistics</PageTitle>
+
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+<style>
+    .trk-root {
+        font-family: 'Space Grotesk', sans-serif;
+        max-width: 680px;
+        margin: 2rem auto;
+        padding: 0 1rem 3rem;
+    }
+
+    /* ── Page header ── */
+    .trk-header {
+        margin-bottom: 1.75rem;
+    }
+
+    .trk-eyebrow {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        color: #F4A100;
+        text-transform: uppercase;
+        margin-bottom: 0.4rem;
+    }
+
+    .trk-h1 {
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: #0A1628;
+        margin: 0;
+        line-height: 1.2;
+    }
+
+    /* ── Search card ── */
+    .trk-search-card {
+        background: linear-gradient(135deg, #0A1628 0%, #1B3D6E 100%);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .trk-search-label {
+        font-size: 12px;
+        color: rgba(255,255,255,0.5);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 0.5rem;
+    }
+
+    .trk-input-row {
+        display: flex;
+        gap: 0;
+    }
+
+    .trk-prefix {
+        background: rgba(255,255,255,0.1);
+        color: #F4A100;
+        font-weight: 600;
+        font-size: 0.85rem;
+        padding: 0 0.75rem;
+        display: flex;
+        align-items: center;
+        border-radius: 6px 0 0 6px;
+        border: 1px solid rgba(255,255,255,0.15);
+        border-right: none;
+        white-space: nowrap;
+    }
+
+    .trk-input {
+        flex: 1;
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.15);
+        border-left: none;
+        border-right: none;
+        color: #fff;
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 1rem;
+        font-weight: 500;
+        padding: 0.65rem 0.75rem;
+        outline: none;
+        letter-spacing: 0.08em;
+        transition: background 0.2s;
+        min-width: 0;
+    }
+
+        .trk-input::placeholder {
+            color: rgba(255,255,255,0.3);
+            font-weight: 400;
+            letter-spacing: 0;
+        }
+
+        .trk-input:focus {
+            background: rgba(255,255,255,0.14);
+        }
+
+    .trk-btn {
+        background: #F4A100;
+        color: #0A1628;
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 0.85rem;
+        font-weight: 700;
+        padding: 0 1.25rem;
+        border: none;
+        border-radius: 0 6px 6px 0;
+        cursor: pointer;
+        transition: background 0.15s, transform 0.1s;
+        white-space: nowrap;
+    }
+
+        .trk-btn:hover:not(:disabled) {
+            background: #e09500;
+        }
+
+        .trk-btn:active:not(:disabled) {
+            transform: scale(0.97);
+        }
+
+        .trk-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+    /* ── Error alert ── */
+    .trk-error {
+        background: rgba(226,75,74,0.12);
+        border: 1px solid rgba(226,75,74,0.35);
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        font-size: 0.875rem;
+        color: #A32D2D;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1.25rem;
+    }
+
+    /* ── Loading state ── */
+    .trk-loading {
+        text-align: center;
+        padding: 2.5rem 1rem;
+    }
+
+    .trk-loading-road {
+        position: relative;
+        height: 40px;
+        margin: 0 auto 1rem;
+        max-width: 320px;
+    }
+
+    .trk-road-line {
+        position: absolute;
+        bottom: 10px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: repeating-linear-gradient(to right, #ddd 0, #ddd 12px, transparent 12px, transparent 24px);
+    }
+
+    .trk-truck-anim {
+        position: absolute;
+        bottom: 6px;
+        font-size: 22px;
+        animation: trkDrive 1.6s ease-in-out infinite alternate;
+    }
+
+    @@keyframes trkDrive {
+        from { left: 5%; }
+        to   { left: 75%; }
+    }
+
+    .trk-loading-text {
+        font-size: 0.875rem;
+        color: #888;
+        font-weight: 500;
+    }
+
+    /* ── Result card ── */
+    .trk-result {
+        border: 0.5px solid rgba(0,0,0,0.1);
+        border-radius: 12px;
+        overflow: hidden;
+        background: #fff;
+    }
+
+    .trk-result-header {
+        background: linear-gradient(135deg, #0A1628 0%, #1B3D6E 100%);
+        padding: 1.25rem 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+
+    .trk-result-id {
+        font-size: 11px;
+        color: rgba(255,255,255,0.5);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: 0.25rem;
+    }
+
+    .trk-result-tracking {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #fff;
+        letter-spacing: 0.06em;
+    }
+
+    .trk-status-badge {
+        font-size: 12px;
+        font-weight: 700;
+        padding: 5px 12px;
+        border-radius: 20px;
+        white-space: nowrap;
+    }
+
+    .badge-in-transit  { background: rgba(244,161,0,0.2);  color: #F4A100; border: 1px solid rgba(244,161,0,0.5); }
+    .badge-delivered   { background: rgba(29,158,117,0.2); color: #0F6E56; border: 1px solid rgba(29,158,117,0.4); }
+    .badge-pending     { background: rgba(133,183,235,0.2);color: #185FA5; border: 1px solid rgba(133,183,235,0.5); }
+    .badge-default     { background: rgba(200,200,200,0.2);color: #444;    border: 1px solid rgba(0,0,0,0.1); }
+
+    .trk-result-body {
+        padding: 1.25rem 1.5rem;
+    }
+
+    .trk-fields {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    @@media (max-width: 480px) {
+        .trk-fields { grid-template-columns: 1fr; }
+    }
+
+    .trk-field-label {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: #999;
+        margin-bottom: 3px;
+        font-weight: 600;
+    }
+
+    .trk-field-value {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #0A1628;
+    }
+
+    /* ── Timeline ── */
+    .trk-timeline-label {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: #aaa;
+        font-weight: 600;
+        margin-bottom: 0.85rem;
+        border-top: 0.5px solid rgba(0,0,0,0.08);
+        padding-top: 1.25rem;
+    }
+
+    .trk-timeline {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .trk-step {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.85rem;
+        padding-bottom: 1.1rem;
+        position: relative;
+    }
+
+    .trk-step-left {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex-shrink: 0;
+        width: 28px;
+    }
+
+    .trk-step-dot {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        flex-shrink: 0;
+        z-index: 1;
+    }
+
+    .dot-done    { background: #E1F5EE; color: #0F6E56; border: 1.5px solid #1D9E75; }
+    .dot-active  { background: #FFF3D6; color: #0A1628; border: 2px solid #F4A100; }
+    .dot-future  { background: #f4f4f4; color: #ccc;    border: 1.5px solid #e0e0e0; }
+
+    .trk-step-line {
+        width: 2px;
+        flex: 1;
+        min-height: 18px;
+        background: #e8e8e8;
+        margin-top: 2px;
+    }
+
+    .line-done   { background: #1D9E75; }
+    .line-active { background: repeating-linear-gradient(to bottom, #F4A100 0, #F4A100 4px, transparent 4px, transparent 8px); }
+
+    .trk-step-content {
+        padding-top: 4px;
+        padding-bottom: 4px;
+    }
+
+    .trk-step-title {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #0A1628;
+        line-height: 1.2;
+    }
+
+    .trk-step-title.future { color: #bbb; }
+
+    .trk-step-sub {
+        font-size: 0.75rem;
+        color: #999;
+        margin-top: 2px;
+    }
+
+    .trk-step:last-child .trk-step-line {
+        display: none;
+    }
+</style>
+
+<div class="trk-root">
+
+    <div class="trk-header">
+        <div class="trk-eyebrow">ABC Logistics</div>
+        <h1 class="trk-h1">Track your shipment</h1>
+    </div>
+
+    <!-- Search card -->
+    <div class="trk-search-card">
+        <div class="trk-search-label">Tracking number</div>
+        <div class="trk-input-row">
+            <div class="trk-prefix">TRK–</div>
+            <input class="trk-input"
+                   placeholder="A1B2C3"
+                   maxlength="6"
+                   @bind="trackingInput"
+                   @bind:event="oninput"
+                   @onkeydown="OnKeyDown"
+                   disabled="@isLoading" />
+            <button class="trk-btn" @onclick="SearchTracking" disabled="@isLoading">
+                @(isLoading ? "..." : "Track ↗")
+            </button>
+        </div>
+    </div>
+
+    <!-- Error -->
+    @if (!string.IsNullOrEmpty(errorMsg))
+    {
+        <div class="trk-error">
+            &#9888; @errorMsg
+        </div>
+    }
+
+    <!-- Loading -->
+    @if (isLoading)
+    {
+        <div class="trk-loading">
+            <div class="trk-loading-road">
+                <div class="trk-road-line"></div>
+                <div class="trk-truck-anim">🚚</div>
+            </div>
+            <div class="trk-loading-text">Locating your shipment…</div>
+        </div>
+    }
+
+    <!-- Result card -->
+    @if (shipmentData != null && !isLoading)
+    {
+        <div class="trk-result">
+
+            <!-- Header -->
+            <div class="trk-result-header">
+                <div>
+                    <div class="trk-result-id">Tracking ID</div>
+                    <div class="trk-result-tracking">@shipmentData.TrackingId</div>
+                </div>
+                <span class="trk-status-badge @GetBadgeClass(shipmentData.CurrentStatus)">
+                    @shipmentData.CurrentStatus
+                </span>
+            </div>
+
+            <!-- Fields -->
+            <div class="trk-result-body">
+                <div class="trk-fields">
+                    <div>
+                        <div class="trk-field-label">Customer</div>
+                        <div class="trk-field-value">@shipmentData.CustomerName</div>
+                    </div>
+                    <div>
+                        <div class="trk-field-label">Destination</div>
+                        <div class="trk-field-value">@shipmentData.DeliveryAddress</div>
+                    </div>
+                    <div>
+                        <div class="trk-field-label">Est. delivery</div>
+                        <div class="trk-field-value">@shipmentData.EstimatedDelivery.ToString("MMM dd, yyyy")</div>
+                    </div>
+                    <div>
+                        <div class="trk-field-label">Time window</div>
+                        <div class="trk-field-value">@shipmentData.EstimatedDelivery.ToString("hh:mm tt")</div>
+                    </div>
+                </div>
+
+                <!-- Timeline -->
+                <div class="trk-timeline-label">Delivery progress</div>
+                <div class="trk-timeline">
+                    @foreach (var (step, index) in TimelineSteps.Select((s, i) => (s, i)))
+                    {
+                        var state = GetStepState(step.Status, shipmentData.CurrentStatus, index);
+                        var isLast = index == TimelineSteps.Count - 1;
+                        <div class="trk-step">
+                            <div class="trk-step-left">
+                                <div class="trk-step-dot @GetDotClass(state)">
+                                    @GetStepIcon(state)
+                                </div>
+                                @if (!isLast)
+                                {
+                                    <div class="trk-step-line @GetLineClass(state)"></div>
+                                }
+                            </div>
+                            <div class="trk-step-content">
+                                <div class="trk-step-title @(state == "future" ? "future" : "")">@step.Label</div>
+                                <div class="trk-step-sub">@step.Description</div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+
+</div>
+
+@code {
+    [Parameter] public string? Id { get; set; }
+
+    private string trackingInput = "";
+    private string? errorMsg;
+    private Shipment? shipmentData;
+    private bool isLoading = false;
+
+    // Auto-search if an ID was passed via the route /track/{Id}
+    protected override async Task OnParametersSetAsync()
+    {
+        if (!string.IsNullOrWhiteSpace(Id))
+        {
+            trackingInput =Id.Trim().ToUpper();
+            await SearchTracking();
+        }
+    }
+
+    private async Task OnKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") await SearchTracking();
+    }
+
+    private async Task SearchTracking()
+    {
+        var clean = "TRK-" + trackingInput.Trim().ToUpper();
+        if (string.IsNullOrWhiteSpace(clean))
+        {
+            errorMsg = "Please enter a tracking number.";
+            return;
+        }
+
+        errorMsg = null;
+        shipmentData = null;
+        isLoading = true;
+
+        try
+        {
+            var response = await Http.GetAsync($"api/tracking/{clean}");
+            if (response.IsSuccessStatusCode)
+            {
+                shipmentData = await response.Content.ReadFromJsonAsync<Shipment>();
+            }
+            else
+            {
+                errorMsg = "Shipment not found. Please double-check the tracking number.";
+            }
+        }
+        catch
+        {
+            errorMsg = "Could not reach the tracking service. Try again in a moment.";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+   
+    private static string GetBadgeClass(string status) => status?.ToLower() switch
+    {
+        "in transit"  or "in-transit"  => "badge-in-transit",
+        "delivered"                    => "badge-delivered",
+        "pending"                      => "badge-pending",
+        _                              => "badge-default"
+    };
+
+  
+    private record TimelineStep(string Status, string Label, string Description);
+
+    private static readonly List<TimelineStep> TimelineSteps = new()
+    {
+        new("Pending",    "Order received",    "Shipment registered and awaiting pickup"),
+        new("In Transit", "In transit",        "Package collected and en route"),
+        new("Out for Delivery", "Out for delivery", "With the local courier for final delivery"),
+        new("Delivered",  "Delivered",         "Package handed over at destination"),
+    };
+
+    private static string GetStepState(string stepStatus, string currentStatus, int stepIndex)
+    {
+        var order = new[] { "Pending", "In Transit", "Out for Delivery", "Delivered" };
+        var currentIdx = Array.FindIndex(order, s => string.Equals(s, currentStatus, StringComparison.OrdinalIgnoreCase));
+        if (currentIdx < 0) currentIdx = 0;
+
+        if (stepIndex < currentIdx)  return "done";
+        if (stepIndex == currentIdx) return "active";
+        return "future";
+    }
+
+    private static string GetDotClass(string state) => state switch
+    {
+        "done"   => "dot-done",
+        "active" => "dot-active",
+        _        => "dot-future"
+    };
+
+    private static string GetLineClass(string state) => state switch
+    {
+        "done"   => "line-done",
+        "active" => "line-active",
+        _        => ""
+    };
+
+    private static string GetStepIcon(string state) => state switch
+    {
+        "done"   => "✓",
+        "active" => "●",
+        _        => "○"
+    };
+
+ 
+    public class Shipment
+    {
+        public string TrackingId { get; set; } = "";
+        public string CustomerName { get; set; } = "";
+        public string DeliveryAddress { get; set; } = "";
+        public string CurrentStatus { get; set; } = "";
+        public DateTime EstimatedDelivery { get; set; }
+    }
+}

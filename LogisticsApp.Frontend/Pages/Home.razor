@@ -1,0 +1,619 @@
+﻿@page "/"
+@inject NavigationManager NavigationManager
+@implements IDisposable
+
+<PageTitle>Home - ABC Logistics</PageTitle>
+
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+<style>
+    .abc-root {
+        font-family: 'Space Grotesk', sans-serif;
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .hero {
+        background: linear-gradient(135deg, #0A1628 0%, #1B3D6E 100%);
+        padding: 2.5rem 2rem 2rem;
+        position: relative;
+        overflow: hidden;
+        border-radius: 12px;
+        margin-bottom: 1rem;
+    }
+
+    .hero-route {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        opacity: 0.12;
+    }
+
+    .route-path {
+        stroke: #F4A100;
+        stroke-width: 2;
+        fill: none;
+        stroke-dasharray: 8 5;
+    }
+
+    .hero-eyebrow {
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        color: #F4A100;
+        text-transform: uppercase;
+        margin-bottom: 0.75rem;
+    }
+
+    .hero-h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #fff;
+        line-height: 1.2;
+        margin-bottom: 0.5rem;
+    }
+
+    .hero-sub {
+        font-size: 0.9rem;
+        color: rgba(255,255,255,0.65);
+        margin-bottom: 1.5rem;
+        line-height: 1.6;
+    }
+
+    .track-card {
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.15);
+        border-radius: 12px;
+        padding: 1.25rem;
+    }
+
+    .track-label {
+        font-size: 12px;
+        color: rgba(255,255,255,0.5);
+        margin-bottom: 0.5rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+    }
+
+    .track-input-row {
+        display: flex;
+        gap: 0;
+        align-items: stretch;
+    }
+
+    .track-prefix {
+        background: rgba(255,255,255,0.1);
+        color: #F4A100;
+        font-weight: 600;
+        font-size: 0.85rem;
+        padding: 0 0.75rem;
+        display: flex;
+        align-items: center;
+        border-radius: 6px 0 0 6px;
+        border: 1px solid rgba(255,255,255,0.15);
+        border-right: none;
+        white-space: nowrap;
+    }
+
+    .track-input {
+        flex: 1;
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.15);
+        border-left: none;
+        border-right: none;
+        color: #fff;
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 1rem;
+        font-weight: 500;
+        padding: 0.6rem 0.75rem;
+        outline: none;
+        letter-spacing: 0.08em;
+        transition: background 0.2s;
+        width: 100%;
+    }
+
+        .track-input::placeholder {
+            color: rgba(255,255,255,0.3);
+            font-weight: 400;
+            letter-spacing: 0;
+        }
+
+        .track-input:focus {
+            background: rgba(255,255,255,0.14);
+        }
+
+    .track-btn {
+        background: #F4A100;
+        color: #0A1628;
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 0.85rem;
+        font-weight: 700;
+        padding: 0 1.25rem;
+        border: none;
+        border-radius: 0 6px 6px 0;
+        cursor: pointer;
+        transition: background 0.15s, transform 0.1s;
+        white-space: nowrap;
+    }
+
+        .track-btn:hover {
+            background: #e09500;
+        }
+
+        .track-btn:active {
+            transform: scale(0.97);
+        }
+
+    .track-hint {
+        margin-top: 0.5rem;
+        font-size: 11px;
+        color: rgba(255,255,255,0.35);
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .truck-wrap {
+        position: relative;
+        width: 100%;
+        height: 36px;
+        overflow: hidden;
+        margin-top: 1rem;
+    }
+
+    .track-road {
+        position: absolute;
+        bottom: 8px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: repeating-linear-gradient(to right, rgba(255,255,255,0.2) 0, rgba(255,255,255,0.2) 12px, transparent 12px, transparent 24px);
+    }
+
+    .truck-icon {
+        position: absolute;
+        bottom: 4px;
+        font-size: 22px;
+        color: #F4A100;
+        transition: left 0.4s ease-in-out;
+    }
+
+    .status-pills {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        margin-top: 1rem;
+    }
+
+    .pill {
+        font-size: 11px;
+        font-weight: 600;
+        padding: 4px 10px;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: opacity 0.15s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+        .pill:hover {
+            opacity: 0.8;
+        }
+
+    .pill-in-transit {
+        background: rgba(244,161,0,0.18);
+        color: #F4A100;
+        border: 1px solid rgba(244,161,0,0.4);
+    }
+
+    .pill-delivered {
+        background: rgba(29,158,117,0.18);
+        color: #5DCAA5;
+        border: 1px solid rgba(29,158,117,0.4);
+    }
+
+    .pill-pending {
+        background: rgba(133,183,235,0.18);
+        color: #85B7EB;
+        border: 1px solid rgba(133,183,235,0.4);
+    }
+
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.75rem;
+        margin-top: 1.5rem;
+    }
+
+    .stat-card {
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 8px;
+        padding: 0.85rem 0.75rem;
+        text-align: center;
+    }
+
+    .stat-num {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #fff;
+        line-height: 1;
+    }
+
+        .stat-num span {
+            color: #F4A100;
+        }
+
+    .stat-lbl {
+        font-size: 10px;
+        color: rgba(255,255,255,0.45);
+        margin-top: 4px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+    }
+
+    .features {
+        padding: 1rem 0 0;
+    }
+
+    .feat-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 0.75rem;
+    }
+
+    .feat-card {
+        background: #fff;
+        border: 0.5px solid rgba(0,0,0,0.1);
+        border-radius: 12px;
+        padding: 1.1rem 1rem;
+        cursor: pointer;
+        transition: border-color 0.2s, background 0.2s;
+    }
+
+        .feat-card:hover {
+            border-color: rgba(0,0,0,0.2);
+            background: #f9f9f9;
+        }
+
+            .feat-card:hover .feat-icon {
+                transform: scale(1.15);
+            }
+
+            .feat-card:hover .feat-cta {
+                opacity: 1;
+            }
+
+    .feat-icon {
+        font-size: 22px;
+        margin-bottom: 0.6rem;
+        display: inline-block;
+        transition: transform 0.2s;
+    }
+
+        .feat-icon.blue {
+            color: #378ADD;
+        }
+
+        .feat-icon.green {
+            color: #639922;
+        }
+
+        .feat-icon.amber {
+            color: #F4A100;
+        }
+
+    .feat-title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #111;
+        margin-bottom: 0.3rem;
+    }
+
+    .feat-desc {
+        font-size: 0.78rem;
+        color: #666;
+        line-height: 1.55;
+    }
+
+    .feat-cta {
+        margin-top: 0.5rem;
+        font-size: 11px;
+        color: #378ADD;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        opacity: 0;
+        transition: opacity 0.15s;
+    }
+
+    .hotline-row {
+        margin-top: 0.75rem;
+        background: #f5f5f5;
+        border: 0.5px solid rgba(0,0,0,0.08);
+        border-radius: 8px;
+        padding: 0.9rem 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .hotline-label {
+        font-size: 12px;
+        color: #555;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .hotline-num {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #111;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .hotline-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #1D9E75;
+        animation: abcPulse 1.8s ease-in-out infinite;
+        flex-shrink: 0;
+    }
+
+    @@keyframes abcPulse {
+        0%, 100% {
+            box-shadow: 0 0 0 0 rgba(29,158,117,0.5);
+        }
+
+        50% {
+            box-shadow: 0 0 0 5px rgba(29,158,117,0);
+        }
+    }
+
+    .abc-toast {
+        position: fixed;
+        bottom: 1.5rem;
+        left: 50%;
+        transform: translateX(-50%) translateY(80px);
+        background: #0A1628;
+        color: #fff;
+        font-size: 13px;
+        font-weight: 500;
+        padding: 0.6rem 1.25rem;
+        border-radius: 20px;
+        border: 1px solid rgba(255,255,255,0.15);
+        z-index: 999;
+        transition: transform 0.3s, opacity 0.3s;
+        opacity: 0;
+        pointer-events: none;
+        font-family: 'Space Grotesk', sans-serif;
+    }
+
+        .abc-toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+</style>
+
+<div class="abc-root">
+
+    <!-- ═══════════ HERO ═══════════ -->
+    <div class="hero">
+        <svg class="hero-route" viewBox="0 0 700 300" preserveAspectRatio="none">
+            <path class="route-path" d="M-20,80 Q100,40 200,120 T400,80 T600,140 T780,60" />
+            <path class="route-path" d="M-20,200 Q150,160 300,220 T600,200 T780,180"
+                  style="stroke:#378ADD;opacity:0.6" />
+        </svg>
+
+        <div class="hero-eyebrow">ABC Logistics</div>
+        <h1 class="hero-h1">Ship it. Track it.<br />Deliver certainty.</h1>
+        <p class="hero-sub">Enterprise freight solutions with real-time visibility across every route.</p>
+
+        <!-- Tracking input -->
+        <div class="track-card">
+            <div class="track-label">Track a shipment</div>
+            <div class="track-input-row">
+                <div class="track-prefix">TRK–</div>
+                <input class="track-input"
+                       placeholder="A1B2C3"
+                       maxlength="6"
+                       value="@trackingInput"
+                       @oninput="OnTrackingInput"
+                       @onkeydown="OnKeyDown" />
+                <button class="track-btn" @onclick="DoTrack">&#8599; Track</button>
+            </div>
+            <div class="track-hint">
+                <span>@TrackingHint</span>
+                <span style="color:rgba(255,255,255,0.25)">@trackingInput.Length/6</span>
+            </div>
+        </div>
+
+        <!-- Animated truck progress bar -->
+        <div class="truck-wrap">
+            <div class="track-road"></div>
+            <div class="truck-icon" style="left:@TruckPosition%">
+                &#x1F69A;
+            </div>
+        </div>
+
+        <!-- Status pills -->
+        <div class="status-pills">
+            <a class="pill pill-in-transit" href="/track?status=in-transit">&#x21BA; In Transit</a>
+            <a class="pill pill-delivered" href="/track?status=delivered">&#x2713; Delivered</a>
+            <a class="pill pill-pending" href="/track?status=pending">&#x23F3; Pending</a>
+        </div>
+
+        <!-- Animated stats -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-num">@AnimatedPackages<span>K</span></div>
+                <div class="stat-lbl">Packages today</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-num">@AnimatedCities<span>+</span></div>
+                <div class="stat-lbl">Cities served</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-num">@AnimatedRate<span>%</span></div>
+                <div class="stat-lbl">On-time rate</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════ FEATURE CARDS ═══════════ -->
+    <div class="features">
+        <div class="feat-grid">
+            <div class="feat-card" @onclick='() => NavigationManager.NavigateTo("/services/tracking")'>
+                <div class="feat-icon blue">&#x1F4CD;</div>
+                <div class="feat-title">Real-time tracking</div>
+                <div class="feat-desc">GPS pings every 90 seconds. Know exactly where your freight is, globally.</div>
+                <div class="feat-cta">Learn more &#8594;</div>
+            </div>
+            <div class="feat-card" @onclick='() => NavigationManager.NavigateTo("/services/security")'>
+                <div class="feat-icon green">&#x1F6E1;</div>
+                <div class="feat-title">Secure transport</div>
+                <div class="feat-desc">Vetted drivers, tamper-evident sealing, and end-to-end data encryption.</div>
+                <div class="feat-cta">Learn more &#8594;</div>
+            </div>
+            <div class="feat-card" @onclick='() => NavigationManager.NavigateTo("/support")'>
+                <div class="feat-icon amber">&#x1F3A7;</div>
+                <div class="feat-title">24/7 support</div>
+                <div class="feat-desc">Dispatch emergencies, rerouting, or delivery queries — we answer any time.</div>
+                <div class="feat-cta">Contact us &#8594;</div>
+            </div>
+        </div>
+
+        <!-- Hotline -->
+        <div class="hotline-row">
+            <span class="hotline-label">&#128222; Dispatch hotline — always open</span>
+            <span class="hotline-num">
+                <span class="hotline-dot"></span>
+                011 123 4567
+            </span>
+        </div>
+    </div>
+
+</div>
+
+<!-- Toast notification -->
+<div class="abc-toast @(showToast ? "show" : "")">@toastMessage</div>
+
+@code {
+    // ── Tracking input ──────────────────────────────────────────────
+    private string trackingInput = "";
+
+    private string TrackingHint => trackingInput.Length switch
+    {
+        0 => "Enter your 6-character tracking code",
+        6 => "Looking good! Hit Track ↗",
+        _ => $"Keep going — {6 - trackingInput.Length} more character{(6 - trackingInput.Length == 1 ? "" : "s")}"
+    };
+
+    private double TruckPosition => 2 + (trackingInput.Length / 6.0 * 88);
+
+    private void OnTrackingInput(ChangeEventArgs e)
+    {
+        var raw = e.Value?.ToString() ?? "";
+        trackingInput = new string(raw.ToUpper().Where(char.IsLetterOrDigit).ToArray()).Length > 6
+            ? new string(raw.ToUpper().Where(char.IsLetterOrDigit).ToArray())[..6]
+            : new string(raw.ToUpper().Where(char.IsLetterOrDigit).ToArray());
+    }
+
+    private void OnKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") DoTrack();
+    }
+
+    private void DoTrack()
+    {
+        if (string.IsNullOrWhiteSpace(trackingInput))
+        {
+            ShowToast("Paste or type your tracking code first");
+            return;
+        }
+        if (trackingInput.Length < 6)
+        {
+            ShowToast($"Tracking codes are 6 characters — you're at {trackingInput.Length}");
+            return;
+        }
+        NavigationManager.NavigateTo($"/track/{trackingInput}");
+    }
+
+    // ── Toast ────────────────────────────────────────────────────────
+    private bool showToast = false;
+    private string toastMessage = "";
+    private System.Threading.CancellationTokenSource? _toastCts;
+
+    private async void ShowToast(string message)
+    {
+        _toastCts?.Cancel();
+        _toastCts = new System.Threading.CancellationTokenSource();
+        var token = _toastCts.Token;
+
+        toastMessage = message;
+        showToast = true;
+        StateHasChanged();
+
+        try
+        {
+            await Task.Delay(2800, token);
+            if (!token.IsCancellationRequested)
+            {
+                showToast = false;
+                StateHasChanged();
+            }
+        }
+        catch (TaskCanceledException) { }
+    }
+
+    // ── Animated stats on load ───────────────────────────────────────
+    private int AnimatedPackages = 0;
+    private int AnimatedCities = 0;
+    private int AnimatedRate = 0;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+
+        await Task.Delay(600);
+        await AnimateCounter(v => AnimatedPackages = v, 24, 1400);
+        await Task.Delay(200);
+        _ = AnimateCounter(v => AnimatedCities = v, 180, 1200);
+        await Task.Delay(200);
+        _ = AnimateCounter(v => AnimatedRate = v, 98, 1000);
+    }
+
+    private async Task AnimateCounter(Action<int> setter, int target, int durationMs)
+    {
+        var steps = 40;
+        var delay = durationMs / steps;
+        for (int i = 1; i <= steps; i++)
+        {
+            var t = (double)i / steps;
+            var ease = 1 - Math.Pow(1 - t, 3);
+            setter((int)Math.Round(ease * target));
+            StateHasChanged();
+            await Task.Delay(delay);
+        }
+        setter(target);
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        _toastCts?.Cancel();
+        _toastCts?.Dispose();
+    }
+}

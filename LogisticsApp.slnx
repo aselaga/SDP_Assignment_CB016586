@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="LogisticsApp.Api/LogisticsApp.Api.csproj" />
+  <Project Path="LogisticsApp.Frontend/LogisticsApp.Frontend.csproj" />
+  <Project Path="LogisticsApp.Tests/LogisticsApp.Tests.csproj" Id="4518976f-c404-49e5-99a3-6f66ef4132cc" />
+</Solution>
