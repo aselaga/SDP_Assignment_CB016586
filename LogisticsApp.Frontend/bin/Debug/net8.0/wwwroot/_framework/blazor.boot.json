@@ -1,7 +1,7 @@
 {
   "mainAssemblyName": "LogisticsApp.Frontend",
   "resources": {
-    "hash": "sha256-l1IeNc6vuenq7Eo06y1FaPNOX92txA0SXR3sIM0o4dE=",
+    "hash": "sha256-eInTNyfCHzHVCNgbu6imSlyw0T354iaQ1nU4WWEYwaA=",
     "jsModuleNative": {
       "dotnet.native.js": "sha256-YDHEHpc+/PUWFYa9BMCN3EcVlpemjKD024swcpPfMIQ="
     },
@@ -26,28 +26,28 @@
       "Microsoft.AspNetCore.Components.Web.wasm": "sha256-H1qHk5Kqn+R+8t/eTsZzQ5/5ZvgjmC8+ZPyuEp5nals=",
       "Microsoft.AspNetCore.Components.WebAssembly.wasm": "sha256-GDJfIU7XS7MlmrwWZh/CD4wNkm+PPO7FFLZ4Qo0jCPU=",
       "Microsoft.AspNetCore.Metadata.wasm": "sha256-95QlbMRtZIDBAVihWRdLt5//Rwcm+0Utb0u4Brzx+L4=",
-      "Microsoft.Extensions.Configuration.wasm": "sha256-UDGEQR7J3WTfzYMgOzxVIBwFQtKEeJvO8UgrWagypdE=",
-      "Microsoft.Extensions.Configuration.Abstractions.wasm": "sha256-yNdqbqDWGiJo943D7LPak5xryCBEsNH0wtdiuU1R9VE=",
-      "Microsoft.Extensions.Configuration.Binder.wasm": "sha256-z4rx/oKV4Rmj1LLt/A3F+PhCEg3wcLXSWHjstLQm5Q4=",
+      "Microsoft.Extensions.Configuration.wasm": "sha256-KXAjk3m4PlgtgL3tctKkmY5TtIsyv0xOSZJglbMSjUo=",
+      "Microsoft.Extensions.Configuration.Abstractions.wasm": "sha256-DyCRSz9E4ZsWrI0t4VN62wAwvNpaEsAtoRU9rBt7944=",
+      "Microsoft.Extensions.Configuration.Binder.wasm": "sha256-dFOeFjqysLUD5JJ2MDPWOgKpuIfQ4QnwuLWfLi16O10=",
       "Microsoft.Extensions.Configuration.FileExtensions.wasm": "sha256-w4E5uayo1SFMsRc1dLJu4EYYaRQpyP7cvyeJNAqH5+4=",
       "Microsoft.Extensions.Configuration.Json.wasm": "sha256-ViitoeUHw71Xhs0JJ88lGca05eRKDi+p+NyaYc6cRIQ=",
-      "Microsoft.Extensions.DependencyInjection.wasm": "sha256-NrPYML1ZOnKmz2Y+n4q5EFp+e4a6g47+gH22VofJd2k=",
-      "Microsoft.Extensions.DependencyInjection.Abstractions.wasm": "sha256-4M02Mi+s9AiYm5DMZz8Ie9CIhGuZoBs6WyQaFgbnD3w=",
+      "Microsoft.Extensions.DependencyInjection.wasm": "sha256-8Zip3WNaPuGGiK2sxyzoQma51DJWegJyYHRDotW45g4=",
+      "Microsoft.Extensions.DependencyInjection.Abstractions.wasm": "sha256-rPr+shiqU9rCFXbhhgOSOAZbCWKW95qSLhVFPGP0YgY=",
       "Microsoft.Extensions.Diagnostics.wasm": "sha256-0Bk0YFzPRFt7DrOjrkEypZ7sdjIc3gojUC7yHRyTQtg=",
       "Microsoft.Extensions.Diagnostics.Abstractions.wasm": "sha256-5Tj4TAmVMxBTt4eP2GdETnhYUoVcq18Ol3Axu0rmkY0=",
       "Microsoft.Extensions.FileProviders.Abstractions.wasm": "sha256-IUopixuV8E09mP+TIgRp/lXEbeacXbUTW7cu0v5B9Tc=",
       "Microsoft.Extensions.FileProviders.Physical.wasm": "sha256-MS+zB0xkKhKk/QdE32ZwKtdlrLMLI/y2NAKPUWhcBVg=",
       "Microsoft.Extensions.FileSystemGlobbing.wasm": "sha256-AnWUKd0qJ8ZNKkRC0AFK2cjjszB7reXiP+bXdIi8bic=",
       "Microsoft.Extensions.Http.wasm": "sha256-6uNqb6X8ioPsqhvQ1tTHuOLdkJ0/iUha+xZ8j3TxiVQ=",
-      "Microsoft.Extensions.Logging.wasm": "sha256-Rx+UwnmyfTtMmlYd3HWJOvYVnSSwShUKrbPvqkfxmZk=",
-      "Microsoft.Extensions.Logging.Abstractions.wasm": "sha256-R+hweMNg9P7RU++DPEpfqsjng2tWserGZEtjsL3gl84=",
-      "Microsoft.Extensions.Options.wasm": "sha256-HPL9mH3zbRHz2Dv2qcWF0dUEk69pohDoiXzfTp2UMyE=",
+      "Microsoft.Extensions.Logging.wasm": "sha256-izbHrg3zX2rarAEzlU90jtZhJ6XzjIdougEUmEgk8NA=",
+      "Microsoft.Extensions.Logging.Abstractions.wasm": "sha256-YV3VZvGsIBi0FiXxWpg9GOOwUskuxZ3/6VnGM5ekW+A=",
+      "Microsoft.Extensions.Options.wasm": "sha256-Roqu0SkVSpdVa7FLTTQbGuNwIzkfgYEWCMY1WsCMHSo=",
       "Microsoft.Extensions.Options.ConfigurationExtensions.wasm": "sha256-r0Tn4Wc/pQqWkWngq4QLt9ZwRcLR7GP8WWr4I4c+dEw=",
-      "Microsoft.Extensions.Primitives.wasm": "sha256-pVrYOTfjb2ITls3LKIByW1t8jwOAWFhmkIVDewtJ1GE=",
+      "Microsoft.Extensions.Primitives.wasm": "sha256-9nH3WjPD8SDvKSD1rTyG/yx9Lrl9Y77sxCTTwBMfWpk=",
       "Microsoft.IdentityModel.Clients.ActiveDirectory.wasm": "sha256-WDiXiyX2kB+khKsPqp11CCQeqwAdrL6O2ih9VR30OsY=",
       "Microsoft.JSInterop.wasm": "sha256-sm2HpM+aEsdu8kPTluhkGijieh9Fr/JLihBU0ZZvtVI=",
       "Microsoft.JSInterop.WebAssembly.wasm": "sha256-3wQR1/VN+SB8r7Gkqf93l8O4F1aSbaghQWV2PoaJByI=",
-      "System.Diagnostics.DiagnosticSource.wasm": "sha256-LqbsEeWYjZwQwfi0vK00XFiaCkSD4U6ycv91Jte73iI=",
+      "System.Diagnostics.DiagnosticSource.wasm": "sha256-s+GFkmUI38oZ5Y0xxcoZ3YHUIOFrDyXJBGcBLmJ94Jw=",
       "System.IO.Pipelines.wasm": "sha256-JqVBy6SV+3qk+IK3VJiyIDt9CsVk6b1/ytTXmrI4mTM=",
       "Microsoft.CSharp.wasm": "sha256-tFEbIu2+rmdfgGBUSLCxWVOJCI+nyPjWJzzYNtQV3Es=",
       "Microsoft.VisualBasic.Core.wasm": "sha256-vjYTGp12XCAEUupw25BCPVg87eJnfLtmP2CXNeSf9gU=",
@@ -216,10 +216,10 @@
       "mscorlib.wasm": "sha256-K9Dyt2y2qc5iOiFtzVJ54OrivbmVXDxkD16w+GkNz6Y=",
       "netstandard.wasm": "sha256-cdbfmZR3ZtA/HeSPpbwrUoRjB1vl4OgPSKGeGSmtiug=",
       "System.Private.CoreLib.wasm": "sha256-naY/8zY/5LD24ypcNRlECeSByBMi44aNk+g16oi63Mc=",
-      "LogisticsApp.Frontend.wasm": "sha256-Z+sWw6IQMWdKcPgt7UxMfu5ZZgLV6Rwy7gdHUGSwV7A="
+      "LogisticsApp.Frontend.wasm": "sha256-xpEnsphPgQQMPhxSHaRh9FBAwGDhbdNyytZsl8/yMfs="
     },
     "pdb": {
-      "LogisticsApp.Frontend.pdb": "sha256-UBnn5ccJ2Bd0PfDd4LIAO0W3XzzZCnYuxfsEhIlUcQc="
+      "LogisticsApp.Frontend.pdb": "sha256-OnDafgxHcVZg2teff800MvNpm/tLkQ6Kb9P6RHHcS7M="
     }
   },
   "cacheBootResources": true,
