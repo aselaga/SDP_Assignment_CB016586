@@ -3,6 +3,22 @@
   "WorkspaceRootPath": "C:\\Users\\Asela\\source\\repos\\aselaga\\SDP_Assignment_CB016586\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{68CEAC11-2764-336E-E84C-523B1396B569}|LogisticsApp.Api\\LogisticsApp.Api.csproj|c:\\users\\asela\\source\\repos\\aselaga\\sdp_assignment_cb016586\\logisticsapp.api\\controllers\\sprintonecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{68CEAC11-2764-336E-E84C-523B1396B569}|LogisticsApp.Api\\LogisticsApp.Api.csproj|solutionrelative:logisticsapp.api\\controllers\\sprintonecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5D1DEECF-EDDB-F30B-B5C3-DF5BF06CEC95}|LogisticsApp.Frontend\\LogisticsApp.Frontend.csproj|c:\\users\\asela\\source\\repos\\aselaga\\sdp_assignment_cb016586\\logisticsapp.frontend\\pages\\dispatcherdashboard.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{5D1DEECF-EDDB-F30B-B5C3-DF5BF06CEC95}|LogisticsApp.Frontend\\LogisticsApp.Frontend.csproj|solutionrelative:logisticsapp.frontend\\pages\\dispatcherdashboard.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5D1DEECF-EDDB-F30B-B5C3-DF5BF06CEC95}|LogisticsApp.Frontend\\LogisticsApp.Frontend.csproj|c:\\users\\asela\\source\\repos\\aselaga\\sdp_assignment_cb016586\\logisticsapp.frontend\\pages\\driverportal.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{5D1DEECF-EDDB-F30B-B5C3-DF5BF06CEC95}|LogisticsApp.Frontend\\LogisticsApp.Frontend.csproj|solutionrelative:logisticsapp.frontend\\pages\\driverportal.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5D1DEECF-EDDB-F30B-B5C3-DF5BF06CEC95}|LogisticsApp.Frontend\\LogisticsApp.Frontend.csproj|c:\\users\\asela\\source\\repos\\aselaga\\sdp_assignment_cb016586\\logisticsapp.frontend\\pages\\addshipment.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{5D1DEECF-EDDB-F30B-B5C3-DF5BF06CEC95}|LogisticsApp.Frontend\\LogisticsApp.Frontend.csproj|solutionrelative:logisticsapp.frontend\\pages\\addshipment.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{5D1DEECF-EDDB-F30B-B5C3-DF5BF06CEC95}|LogisticsApp.Frontend\\LogisticsApp.Frontend.csproj|c:\\users\\asela\\source\\repos\\aselaga\\sdp_assignment_cb016586\\logisticsapp.frontend\\pages\\login.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{5D1DEECF-EDDB-F30B-B5C3-DF5BF06CEC95}|LogisticsApp.Frontend\\LogisticsApp.Frontend.csproj|solutionrelative:logisticsapp.frontend\\pages\\login.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
@@ -27,19 +43,71 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "SprintOneController.cs",
+              "DocumentMoniker": "C:\\Users\\Asela\\source\\repos\\aselaga\\SDP_Assignment_CB016586\\LogisticsApp.Api\\Controllers\\SprintOneController.cs",
+              "RelativeDocumentMoniker": "LogisticsApp.Api\\Controllers\\SprintOneController.cs",
+              "ToolTip": "C:\\Users\\Asela\\source\\repos\\aselaga\\SDP_Assignment_CB016586\\LogisticsApp.Api\\Controllers\\SprintOneController.cs",
+              "RelativeToolTip": "LogisticsApp.Api\\Controllers\\SprintOneController.cs",
+              "ViewState": "AgIAAFQAAAAAAAAAAAAwwGkAAAAxAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-13T16:29:57.468Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "DispatcherDashboard.razor",
+              "DocumentMoniker": "C:\\Users\\Asela\\source\\repos\\aselaga\\SDP_Assignment_CB016586\\LogisticsApp.Frontend\\Pages\\DispatcherDashboard.razor",
+              "RelativeDocumentMoniker": "LogisticsApp.Frontend\\Pages\\DispatcherDashboard.razor",
+              "ToolTip": "C:\\Users\\Asela\\source\\repos\\aselaga\\SDP_Assignment_CB016586\\LogisticsApp.Frontend\\Pages\\DispatcherDashboard.razor",
+              "RelativeToolTip": "LogisticsApp.Frontend\\Pages\\DispatcherDashboard.razor",
+              "ViewState": "AgIAAHQDAAAAAAAAAAAAAIcDAABDAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-06-13T16:28:32.956Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "DriverPortal.razor",
+              "DocumentMoniker": "C:\\Users\\Asela\\source\\repos\\aselaga\\SDP_Assignment_CB016586\\LogisticsApp.Frontend\\Pages\\DriverPortal.razor",
+              "RelativeDocumentMoniker": "LogisticsApp.Frontend\\Pages\\DriverPortal.razor",
+              "ToolTip": "C:\\Users\\Asela\\source\\repos\\aselaga\\SDP_Assignment_CB016586\\LogisticsApp.Frontend\\Pages\\DriverPortal.razor",
+              "RelativeToolTip": "LogisticsApp.Frontend\\Pages\\DriverPortal.razor",
+              "ViewState": "AgIAAEcBAAAAAAAAAAAAANQAAAAXAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-06-13T16:23:30.672Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "AddShipment.razor",
+              "DocumentMoniker": "C:\\Users\\Asela\\source\\repos\\aselaga\\SDP_Assignment_CB016586\\LogisticsApp.Frontend\\Pages\\AddShipment.razor",
+              "RelativeDocumentMoniker": "LogisticsApp.Frontend\\Pages\\AddShipment.razor",
+              "ToolTip": "C:\\Users\\Asela\\source\\repos\\aselaga\\SDP_Assignment_CB016586\\LogisticsApp.Frontend\\Pages\\AddShipment.razor",
+              "RelativeToolTip": "LogisticsApp.Frontend\\Pages\\AddShipment.razor",
+              "ViewState": "AgIAAMgBAAAAAAAAAAAAALkBAAAoAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-06-13T16:19:32.694Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
               "Title": "Login.razor",
               "DocumentMoniker": "C:\\Users\\Asela\\source\\repos\\aselaga\\SDP_Assignment_CB016586\\LogisticsApp.Frontend\\Pages\\Login.razor",
               "RelativeDocumentMoniker": "LogisticsApp.Frontend\\Pages\\Login.razor",
               "ToolTip": "C:\\Users\\Asela\\source\\repos\\aselaga\\SDP_Assignment_CB016586\\LogisticsApp.Frontend\\Pages\\Login.razor",
               "RelativeToolTip": "LogisticsApp.Frontend\\Pages\\Login.razor",
-              "ViewState": "AgIAAA4BAAAAAAAAAAAAAB4BAAAoAAAAAAAAAA==",
+              "ViewState": "AgIAANsAAAAAAAAAAAAAACkBAAA6AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
               "WhenOpened": "2026-06-13T14:19:08.016Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 5,
               "Title": "UserManagementTests.cs",
               "DocumentMoniker": "C:\\Users\\Asela\\source\\repos\\aselaga\\SDP_Assignment_CB016586\\LogisticsApp.Tests\\UserManagementTests.cs",
               "RelativeDocumentMoniker": "LogisticsApp.Tests\\UserManagementTests.cs",

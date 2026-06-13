@@ -89,7 +89,7 @@ namespace LogisticsApp.Api.Controllers
                 .ToListAsync();
         }
 
-        // Endpoint 5: Driver updates the shipment status
+        // Endpoint 5: Updates the shipment status
         [Authorize(Roles = "Dispatcher,Driver")]
         [HttpPut("driver/update-status")]
         public async Task<IActionResult> UpdateStatus([FromBody] UpdateStatusRequest request)
@@ -107,8 +107,7 @@ namespace LogisticsApp.Api.Controllers
                 Action = "Status Updated",
                 Details = $"Status changed from '{oldStatus}' to '{request.NewStatus}'",
 
-                //PerformedBy = User.Identity.Name ?? "Driver",
-                PerformedBy = "Driver",
+                PerformedBy = User.Identity?.Name?? User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value?? "Unknown",
 
                 Timestamp = DateTime.UtcNow
             });

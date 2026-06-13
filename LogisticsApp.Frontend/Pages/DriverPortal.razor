@@ -209,7 +209,8 @@
                 </div>
 
                 <div class="drv-actions">
-                    @if (pkg.CurrentStatus == "Out for delivery" || pkg.CurrentStatus == "Processing")
+                    @if (pkg.CurrentStatus == "Out for delivery")
+                     //   @if (pkg.CurrentStatus == "Out for delivery" || pkg.CurrentStatus == "Processing")
                     {
                         <button class="drv-btn btn-transit" @onclick="@(() => UpdateStatus(pkg.TrackingId, "In Transit"))">
                             🚚 Start Route (In Transit)
