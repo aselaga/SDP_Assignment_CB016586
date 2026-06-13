@@ -1,7 +1,7 @@
 {
   "mainAssemblyName": "LogisticsApp.Frontend",
   "resources": {
-    "hash": "sha256-1VqdwFZsmshJTVTbNITwriEREppFisccZMKpYcWZDuU=",
+    "hash": "sha256-l1IeNc6vuenq7Eo06y1FaPNOX92txA0SXR3sIM0o4dE=",
     "jsModuleNative": {
       "dotnet.native.js": "sha256-YDHEHpc+/PUWFYa9BMCN3EcVlpemjKD024swcpPfMIQ="
     },
@@ -216,10 +216,10 @@
       "mscorlib.wasm": "sha256-K9Dyt2y2qc5iOiFtzVJ54OrivbmVXDxkD16w+GkNz6Y=",
       "netstandard.wasm": "sha256-cdbfmZR3ZtA/HeSPpbwrUoRjB1vl4OgPSKGeGSmtiug=",
       "System.Private.CoreLib.wasm": "sha256-naY/8zY/5LD24ypcNRlECeSByBMi44aNk+g16oi63Mc=",
-      "LogisticsApp.Frontend.wasm": "sha256-R10EHfFDXwP+Y7QBJDHy+nmEYN+yA9OZpTsELbv1bBs="
+      "LogisticsApp.Frontend.wasm": "sha256-Z+sWw6IQMWdKcPgt7UxMfu5ZZgLV6Rwy7gdHUGSwV7A="
     },
     "pdb": {
-      "LogisticsApp.Frontend.pdb": "sha256-KsnQXNrBGo22GeJ4KLn/Zra5FdWkrhrx5kiJvHH4KBE="
+      "LogisticsApp.Frontend.pdb": "sha256-UBnn5ccJ2Bd0PfDd4LIAO0W3XzzZCnYuxfsEhIlUcQc="
     }
   },
   "cacheBootResources": true,

@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("LogisticsApp.Frontend")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9623f7c29e278d26224d093cd22861cd27b14f97")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+38c0373dbe20b58456a709532101eadd2a617aef")]
 [assembly: System.Reflection.AssemblyProductAttribute("LogisticsApp.Frontend")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LogisticsApp.Frontend")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

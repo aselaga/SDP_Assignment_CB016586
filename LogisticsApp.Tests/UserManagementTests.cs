@@ -38,7 +38,7 @@ namespace LogisticsApp.Tests
             Assert.Contains("✨ New Employee Setup", cut.Markup);
 
             // Verify that the specific input field for the Full Name exists on the screen
-            var nameInput = cut.Find("input[placeholder='e.g. Jane Doe']");
+            var nameInput = cut.Find("input[placeholder='name@abclogistics.com']");
             Assert.NotNull(nameInput);
         }
     }

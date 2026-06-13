@@ -341,6 +341,14 @@
           }
         }
       },
+      "Microsoft.IdentityModel.Clients.ActiveDirectory/5.3.0": {
+        "runtime": {
+          "lib/netstandard1.3/Microsoft.IdentityModel.Clients.ActiveDirectory.dll": {
+            "assemblyVersion": "5.3.0.0",
+            "fileVersion": "5.3.0.0"
+          }
+        }
+      },
       "Microsoft.IdentityModel.JsonWebTokens/8.0.1": {
         "dependencies": {
           "Microsoft.IdentityModel.Tokens": "8.0.1"
@@ -840,7 +848,8 @@
       "LogisticsApp.Frontend/1.0.0": {
         "dependencies": {
           "Blazored.LocalStorage": "4.4.0",
-          "Microsoft.AspNetCore.Components.WebAssembly": "10.0.0"
+          "Microsoft.AspNetCore.Components.WebAssembly": "10.0.0",
+          "Microsoft.IdentityModel.Clients.ActiveDirectory": "5.3.0"
         },
         "runtime": {
           "LogisticsApp.Frontend.dll": {
@@ -1024,6 +1033,13 @@
       "sha512": "sha512-OtlIWcyX01olfdevPKZdIPfBEvbcioDyBiE/Z2lHsopsMD7twcKtlN9kMevHmI5IIPhFpfwCIiR6qHQz1WHUIw==",
       "path": "microsoft.identitymodel.abstractions/8.0.1",
       "hashPath": "microsoft.identitymodel.abstractions.8.0.1.nupkg.sha512"
+    },
+    "Microsoft.IdentityModel.Clients.ActiveDirectory/5.3.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-Rqp67MLcvFejnClly1IGRIkHZNqrBqeHlhhX5CEgjrXbs554xkeyk82gMto04TdNafLpC/3CatqITFY82E3NiQ==",
+      "path": "microsoft.identitymodel.clients.activedirectory/5.3.0",
+      "hashPath": "microsoft.identitymodel.clients.activedirectory.5.3.0.nupkg.sha512"
     },
     "Microsoft.IdentityModel.JsonWebTokens/8.0.1": {
       "type": "package",
